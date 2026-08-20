@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPSE - Comparador Tributário Avançado</title>
+    <title>PPSE Consultoria Contábil - Comparador Tributário 2027</title>
     <style>
         :root {
             --ppse-orange: #DA3E1B;
@@ -125,12 +125,12 @@
             </div>
 
             <div class="form-group">
-                <label>Compras c/ NF (Base Crédito ICMS) (R$)</label>
+                <label>Compras c/ NF (Base Crédito ICMS e CBS) (R$)</label>
                 <input type="number" id="comprasNF" value="4500" oninput="calcular()">
             </div>
 
             <div class="form-group">
-                <label>Despesas c/ Crédito de CBS (15%) (R$)</label>
+                <label>Despesas c/ Crédito de CBS (R$)</label>
                 <input type="number" id="despesasCBS" value="2250" oninput="calcular()">
             </div>
 
@@ -230,7 +230,7 @@
                             <td id="valCSLL">R$ 0,00</td>
                         </tr>
                         <tr>
-                            <td>CBS Líquida (Débito - Crédito)</td>
+                            <td>CBS Líquida (Faturamento - Compras - Despesas)</td>
                             <td id="baseCBS">R$ 0,00</td>
                             <td id="valCBS">R$ 0,00</td>
                         </tr>
@@ -256,7 +256,7 @@
     </div>
 
     <footer>
-        <p>PPSE Contábil & contabilidadeja.com | Diagnóstico Tributário Inteligente</p>
+        <p>PPSE Contábil | Developed by Célio Gomes</p>
     </footer>
 </div>
 
@@ -296,7 +296,7 @@
 
         if (fatTotal === 0) return;
 
-        // Fator R
+        // 1. Fator R
         const rbt12 = fatTotal * 12;
         const folha12 = folha * 12;
         const fatorR = rbt12 > 0 ? (folha12 / rbt12) : 0;
@@ -319,7 +319,7 @@
             badge.className = "status-badge badge-anexo3";
         }
 
-        // Simples Nacional Puro
+        // 2. Simples Nacional Puro
         const faixa = obterFaixa(rbt12);
         const dadosAnexo = TABELA_NOVO_2[anexoEfetivo];
         const nom = dadosAnexo.nominal[faixa];
@@ -330,17 +330,20 @@
 
         const impostoSimplesPuro = fatTotal * aliqEfetivaSimples;
 
-        // Simples Híbrido
+        // 3. Simples Híbrido
         const parteRetiradaPct = dadosAnexo.cbsHibrido;
         const aliqSimplesHibrido = aliqEfetivaSimples * (1 - parteRetiradaPct);
         const dasSimplesHibrido = fatTotal * aliqSimplesHibrido;
 
+        // RACIONAL CORRIGIDO DA CBS (Faturamento - Compras - Despesas) x Alíquota
         const cbsDebito = fatTotal * aliqCBSInput * (1 - pReducao);
-        const cbsCredito = despesasCBS * aliqCBSInput;
-        const cbsLiquido = Math.max(0, cbsDebito - cbsCredito);
+        const cbsCreditoCompras = comprasNF * aliqCBSInput;
+        const cbsCreditoDespesas = despesasCBS * aliqCBSInput;
+        const cbsLiquido = Math.max(0, cbsDebito - cbsCreditoCompras - cbsCreditoDespesas);
+        
         const totalSimplesHibrido = dasSimplesHibrido + cbsLiquido;
 
-        // Lucro Presumido
+        // 4. Lucro Presumido
         const fatorReducaoBase = (1 - pReducao);
         const baseCalculoServ = fatServ * 0.32 * fatorReducaoBase;
         const baseCalculoVend = fatVend * 0.08 * fatorReducaoBase;
@@ -352,7 +355,7 @@
 
         const totalCSLL = baseIRPJCSLL * 0.09;
 
-        // ICMS Apenas sobre Vendas (Comunicação/Comércio)
+        // ICMS Apenas sobre Vendas
         const icmsDebito = fatVend * aliqIcmsSaida * fatorReducaoBase;
         const icmsCredito = comprasNF * aliqIcmsEntrada;
         const icmsLiquido = Math.max(0, icmsDebito - icmsCredito);
