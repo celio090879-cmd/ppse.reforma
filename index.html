@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPSE - Comparador Tributário Oficial (LC 123/06)</title>
+    <title>PPSE Contábil - Comparador Tributário Oficial</title>
     <style>
         :root {
             --ppse-orange: #DA3E1B;
@@ -17,88 +17,111 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--ppse-light-bg); color: var(--text-dark); padding: 25px 15px; line-height: 1.5; }
+        body { background-color: var(--ppse-light-bg); color: var(--text-dark); padding: 20px 15px; line-height: 1.4; }
         .container { max-width: 1250px; margin: 0 auto; }
         
         header {
             background-color: var(--card-white);
-            border-top: 5px solid var(--ppse-orange);
-            color: var(--ppse-dark-gray); padding: 25px 30px; border-radius: 8px; text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; border-bottom: 1px solid var(--border-color);
+            border-top: 4px solid var(--ppse-orange);
+            color: var(--ppse-dark-gray); padding: 15px 25px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 20px; border-bottom: 1px solid var(--border-color);
         }
-        header h1 { font-size: 2.1rem; color: var(--ppse-dark-gray); font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
-        header h1 span { color: var(--ppse-orange); }
-        header p { color: var(--ppse-medium-gray); font-size: 0.98rem; }
+        .header-logo img { height: 48px; width: auto; display: block; }
+        .header-title { text-align: right; }
+        .header-title h1 { font-size: 1.5rem; color: var(--ppse-dark-gray); font-weight: 700; }
+        .header-title p { color: var(--ppse-medium-gray); font-size: 0.88rem; }
 
-        .layout-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
+        .layout-grid { display: grid; grid-template-columns: 360px 1fr; gap: 18px; }
         @media (max-width: 900px) { .layout-grid { grid-template-columns: 1fr; } }
 
         .card {
-            background: var(--card-white); border-radius: 8px; padding: 22px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border-color);
-            margin-bottom: 20px;
+            background: var(--card-white); border-radius: 8px; padding: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03); border: 1px solid var(--border-color);
+            margin-bottom: 15px;
         }
         .card h2 {
-            font-size: 1.15rem; color: var(--ppse-dark-gray); margin-bottom: 15px;
-            border-bottom: 2px solid var(--ppse-orange); padding-bottom: 6px; font-weight: 700;
+            font-size: 1.05rem; color: var(--ppse-dark-gray); margin-bottom: 12px;
+            border-bottom: 2px solid var(--ppse-orange); padding-bottom: 5px; font-weight: 700;
         }
 
-        .form-group { margin-bottom: 13px; }
-        .form-row { display: flex; gap: 10px; }
+        .form-group { margin-bottom: 10px; }
+        .form-row { display: flex; gap: 8px; }
         .form-row .form-group { flex: 1; }
 
-        label { display: block; font-weight: 600; font-size: 0.83rem; margin-bottom: 4px; color: var(--ppse-dark-gray); }
+        label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 3px; color: var(--ppse-dark-gray); }
         input, select {
-            width: 100%; padding: 9px 11px; border: 1px solid var(--border-color);
-            border-radius: 5px; font-size: 0.9rem; background: #fff; color: var(--text-dark);
-            transition: border-color 0.2s;
+            width: 100%; padding: 7px 10px; border: 1px solid var(--border-color);
+            border-radius: 5px; font-size: 0.85rem; background: #fff; color: var(--text-dark);
         }
         input:focus, select:focus { outline: none; border-color: var(--ppse-orange); }
 
-        .highlight-input { border-left: 3px solid var(--ppse-orange); }
-
-        .btn-calc {
+        .btn-calc, .btn-print {
             width: 100%; background: var(--ppse-orange); color: white; border: none;
-            padding: 12px; border-radius: 5px; font-weight: bold; font-size: 0.95rem;
-            cursor: pointer; margin-top: 10px; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 10px; border-radius: 5px; font-weight: bold; font-size: 0.9rem;
+            cursor: pointer; margin-top: 8px; transition: 0.2s; text-transform: uppercase;
         }
+        .btn-print { background: var(--ppse-dark-gray); margin-top: 5px; }
         .btn-calc:hover { background: var(--ppse-orange-hover); }
 
         .fator-r-box {
-            background: #FFF8F5; border-left: 4px solid var(--ppse-orange); padding: 14px;
-            border-radius: 0 6px 6px 0; margin-bottom: 18px; font-size: 0.9rem;
+            background: #FFF8F5; border-left: 4px solid var(--ppse-orange); padding: 10px 14px;
+            border-radius: 0 6px 6px 0; margin-bottom: 12px; font-size: 0.85rem;
         }
         .status-badge {
-            display: inline-block; padding: 4px 12px; border-radius: 12px; font-weight: bold;
-            font-size: 0.8rem; margin-top: 6px;
+            display: inline-block; padding: 3px 10px; border-radius: 12px; font-weight: bold;
+            font-size: 0.78rem; margin-top: 4px;
         }
         .badge-anexo3 { background-color: #E6F4EA; color: #1e7e34; }
         .badge-anexo5 { background-color: #FCE8E6; color: var(--ppse-orange); }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.88rem; }
-        th, td { padding: 9px 11px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 0.85rem; }
+        th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border-color); }
         th { background: #F1F3F5; color: var(--ppse-dark-gray); font-weight: 700; }
-        .highlight-row { background-color: #FFF5F2; font-weight: bold; }
-        .highlight-row td { color: var(--ppse-orange); }
 
-        footer { text-align: center; color: var(--ppse-medium-gray); font-size: 0.82rem; margin-top: 30px; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        /* DESTAQUE DE MENOR IMPOSTO EM VERMELHO E DEMAIS EM PRETO */
+        .text-black { color: #000000 !important; font-weight: normal; }
+        .row-winner { background-color: #FFF0ED !important; font-weight: bold !important; }
+        .row-winner td { color: #DA3E1B !important; font-weight: bold !important; }
+
+        footer { text-align: center; color: var(--ppse-medium-gray); font-size: 0.8rem; margin-top: 20px; }
+
+        /* REGRAS ESTREITAS DE IMPRESSÃO (PÁGINA ÚNICA A4) */
+        @media print {
+            @page { size: A4 portrait; margin: 8mm; }
+            body { background: #fff !important; padding: 0 !important; font-size: 10px !important; }
+            .container { max-width: 100% !important; margin: 0 !important; }
+            header { padding: 8px 15px !important; margin-bottom: 10px !important; border-top-width: 3px !important; }
+            .header-logo img { height: 35px !important; }
+            .header-title h1 { font-size: 1.2rem !important; }
+            .layout-grid { display: grid !important; grid-template-columns: 300px 1fr !important; gap: 10px !important; }
+            .card { padding: 10px !important; margin-bottom: 8px !important; box-shadow: none !important; border: 1px solid #ccc !important; }
+            .btn-calc, .btn-print, footer { display: none !important; }
+            .fator-r-box { padding: 6px 10px !important; margin-bottom: 8px !important; }
+            th, td { padding: 5px 8px !important; font-size: 9px !important; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>PPSE <span>Contábil</span> - Comparador Tributário RBT12</h1>
-        <p>Cálculo Oficial LC 123/06: Alíquota Efetiva com RBT12 e Fator R via FS12</p>
+        <div class="header-logo">
+            <img src="PPSE_logo_color_OFICIAL.jpg" alt="PPSE Contábil">
+        </div>
+        <div class="header-title">
+            <h1>Demonstrativo de Planejamento Tributário</h1>
+            <p>Análise de Regimes: Simples Nacional, Reforma Tributária & Lucro Presumido</p>
+        </div>
     </header>
 
     <div class="layout-grid">
-        <!-- FORMULÁRIO COM DADOS ACUMULADOS -->
+        <!-- FORMULÁRIO -->
         <div class="card">
-            <h2>Dados Acumulados (12 Meses)</h2>
+            <h2>Parâmetros do Cliente</h2>
             
             <div class="form-group">
-                <label>Anexo Base do Simples Nacional</label>
+                <label>Anexo Base (Simples Nacional)</label>
                 <select id="anexoSelect" onchange="calcular()">
                     <option value="I">Anexo I - Comércio</option>
                     <option value="II">Anexo II - Indústria</option>
@@ -109,16 +132,14 @@
             </div>
 
             <div class="form-group">
-                <label>Receita Bruta Acumulada 12 Meses - RBT12 (R$)</label>
-                <input type="number" class="highlight-input" id="rbt12Input" value="360000" oninput="calcular()" placeholder="Ex: 360000">
+                <label>RBT12 - Receita Acumulada 12 Meses (R$)</label>
+                <input type="number" id="rbt12Input" value="360000" oninput="calcular()">
             </div>
 
             <div class="form-group">
-                <label>Folha de Salários / Pró-Labore 12 Meses - FS12 (R$)</label>
-                <input type="number" class="highlight-input" id="fs12Input" value="100800" oninput="calcular()" placeholder="Ex: 100800">
+                <label>FS12 - Folha Acumulada 12 Meses (R$)</label>
+                <input type="number" id="fs12Input" value="100800" oninput="calcular()">
             </div>
-
-            <h2>Faturamento & Entradas do Mês</h2>
 
             <div class="form-row">
                 <div class="form-group">
@@ -140,8 +161,6 @@
                 <label>Despesas c/ Crédito CBS no Mês (R$)</label>
                 <input type="number" id="despesasCBS" value="2250" oninput="calcular()">
             </div>
-
-            <h2>Alíquotas Personalizadas</h2>
 
             <div class="form-row">
                 <div class="form-group">
@@ -171,12 +190,13 @@
             </div>
 
             <button class="btn-calc" onclick="calcular()">Recalcular Tabela</button>
+            <button class="btn-print" onclick="window.print()">Imprimir Demonstrativo</button>
         </div>
 
-        <!-- PAINEL DE RESULTADOS E MEMÓRIA DE CÁLCULO -->
+        <!-- QUADROS DE RESULTADO -->
         <div>
             <div class="card">
-                <h2>Análise Oficial do Fator R (FS12 / RBT12)</h2>
+                <h2>Status do Fator R (LC 123/06)</h2>
                 <div class="fator-r-box">
                     <p>Fator R Acumulado: <strong id="fatorRPct">28,00%</strong> (FS12 / RBT12)</p>
                     <div id="fatorRBadge" class="status-badge badge-anexo3">Enquadrado no Anexo III</div>
@@ -187,25 +207,25 @@
                     <thead>
                         <tr>
                             <th>Regime Tributário</th>
-                            <th>Imposto no Mês</th>
+                            <th>Imposto Mensal</th>
                             <th>Alíquota Efetiva</th>
                             <th>Margem Bruta Est.</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Simples Nacional Puro (LC 123/06)</td>
+                        <tr id="rowSimplesPuro">
+                            <td>Simples Nacional Puro</td>
                             <td id="simplesPuroVal">R$ 0,00</td>
                             <td id="simplesPuroPct">0,00%</td>
                             <td id="margemSimplesPuro">0,00%</td>
                         </tr>
-                        <tr class="highlight-row">
+                        <tr id="rowSimplesHibrido">
                             <td>Simples Híbrido + CBS (Reforma)</td>
                             <td id="simplesHibridoVal">R$ 0,00</td>
                             <td id="simplesHibridoPct">0,00%</td>
                             <td id="margemSimplesHibrido">0,00%</td>
                         </tr>
-                        <tr>
+                        <tr id="rowLucroPresumido">
                             <td>Lucro Presumido</td>
                             <td id="lucroPresumidoVal">R$ 0,00</td>
                             <td id="lucroPresumidoPct">0,00%</td>
@@ -215,7 +235,6 @@
                 </table>
             </div>
 
-            <!-- MEMÓRIA DE CÁLCULO LEGISLATIVA -->
             <div class="card">
                 <h2>Memória de Cálculo - Simples Nacional & Lucro Presumido</h2>
                 <table>
@@ -227,47 +246,47 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Faixa de Enquadramento no Simples</td>
+                        <tr class="text-black">
+                            <td>Faixa do Simples Nacional</td>
                             <td id="memoRBT12">RBT12: R$ 0,00</td>
                             <td id="memoFaixa">1ª Faixa</td>
                         </tr>
-                        <tr>
+                        <tr class="text-black">
                             <td>Alíquota Nominal x Parcela a Deduzir</td>
                             <td id="memoNominal">Nominal: 0,00%</td>
                             <td id="memoDeducao">Dedução: R$ 0,00</td>
                         </tr>
-                        <tr>
-                            <td>Alíquota Efetiva Oficial [(RBT12 * Nom - Ded) / RBT12]</td>
+                        <tr class="text-black">
+                            <td>Alíquota Efetiva Simples [(RBT12 * Nom - Ded) / RBT12]</td>
                             <td>Faturamento Mês</td>
                             <td id="memoAliqEfetiva">0,00%</td>
                         </tr>
-                        <tr>
+                        <tr class="text-black">
                             <td>IRPJ Lucro Presumido (15% + Adicional 10%)</td>
                             <td id="baseIRPJ">Base: R$ 0,00</td>
                             <td id="valIRPJ">R$ 0,00</td>
                         </tr>
-                        <tr>
+                        <tr class="text-black">
                             <td>CSLL Lucro Presumido (9%)</td>
                             <td id="baseCSLL">Base: R$ 0,00</td>
                             <td id="valCSLL">R$ 0,00</td>
                         </tr>
-                        <tr>
+                        <tr class="text-black">
                             <td>CBS Líquida (Faturamento - Compras - Despesas)</td>
                             <td id="baseCBS">Base: R$ 0,00</td>
                             <td id="valCBS">R$ 0,00</td>
                         </tr>
-                        <tr>
+                        <tr class="text-black">
                             <td>ICMS Líquido (Vendas x Saída - Compras x Entrada)</td>
                             <td id="baseICMS">Vendas: R$ 0,00</td>
                             <td id="valICMS">R$ 0,00</td>
                         </tr>
-                        <tr>
+                        <tr class="text-black">
                             <td>ISS Líquido (Serviços x Alíquota ISS)</td>
                             <td id="baseISS">Serviços: R$ 0,00</td>
                             <td id="valISS">R$ 0,00</td>
                         </tr>
-                        <tr class="highlight-row">
+                        <tr class="text-black" style="font-weight: bold;">
                             <td>Total Lucro Presumido no Mês</td>
                             <td>-</td>
                             <td id="valTotalLP">R$ 0,00</td>
@@ -279,12 +298,11 @@
     </div>
 
     <footer>
-        <p>PPSE Contábil & contabilidadeja.com | Diagnóstico Fiscal em Conformidade com a LC 123/2006</p>
+        <p>PPSE Contábil & contabilidadeja.com | Diagnóstico Fiscal de Alta Precisão</p>
     </footer>
 </div>
 
 <script>
-    // Tabelas Oficiais do Simples Nacional (LC 123/2006)
     const TABELAS_SIMPLES = {
         'I':   { nominal: [0.04, 0.073, 0.095, 0.107, 0.143, 0.19], deducao: [0, 5940, 13860, 22500, 87300, 378000], cbsHibrido: 0.155 },
         'II':  { nominal: [0.045, 0.079, 0.10, 0.112, 0.147, 0.30], deducao: [0, 5940, 13860, 22500, 85000, 720000], cbsHibrido: 0.1385 },
@@ -310,10 +328,7 @@
         let rbt12 = parseFloat(document.getElementById('rbt12Input').value) || 0;
         let fs12 = parseFloat(document.getElementById('fs12Input').value) || 0;
 
-        // Se RBT12 for menor que o faturamento do mês, ajusta para o faturamento mínimo
-        if (rbt12 < fatTotalMes * 12 && rbt12 === 0) {
-            rbt12 = fatTotalMes * 12;
-        }
+        if (rbt12 === 0 && fatTotalMes > 0) rbt12 = fatTotalMes * 12;
 
         const comprasNF = parseFloat(document.getElementById('comprasNF').value) || 0;
         const despesasCBS = parseFloat(document.getElementById('despesasCBS').value) || 0;
@@ -327,7 +342,7 @@
 
         if (fatTotalMes === 0 && rbt12 === 0) return;
 
-        // 1. FATOR R OFICIAL (FS12 / RBT12)
+        // Fator R
         const fatorR = rbt12 > 0 ? (fs12 / rbt12) : 0;
         document.getElementById('fatorRPct').innerText = (fatorR * 100).toFixed(2) + "%";
 
@@ -348,7 +363,7 @@
             badge.className = "status-badge badge-anexo3";
         }
 
-        // 2. CÁLCULO OFICIAL DA ALÍQUOTA EFETIVA (LC 123/2006)
+        // Simples Nacional Puro
         const faixaIdx = obterFaixa(rbt12);
         const dadosAnexo = TABELAS_SIMPLES[anexoEfetivo];
         const nom = dadosAnexo.nominal[faixaIdx];
@@ -359,12 +374,11 @@
 
         const impostoSimplesPuro = fatTotalMes * aliqEfetivaSimples;
 
-        // 3. SIMPLES HÍBRIDO (REFORMA TRIBUTÁRIA)
+        // Simples Híbrido
         const parteRetiradaPct = dadosAnexo.cbsHibrido;
         const aliqSimplesHibrido = aliqEfetivaSimples * (1 - parteRetiradaPct);
         const dasSimplesHibrido = fatTotalMes * aliqSimplesHibrido;
 
-        // CBS Líquida
         const cbsDebito = fatTotalMes * aliqCBSInput * (1 - pReducao);
         const cbsCreditoCompras = comprasNF * aliqCBSInput;
         const cbsCreditoDespesas = despesasCBS * aliqCBSInput;
@@ -372,7 +386,7 @@
 
         const totalSimplesHibrido = dasSimplesHibrido + cbsLiquido;
 
-        // 4. LUCRO PRESUMIDO
+        // Lucro Presumido
         const fatorReducaoBase = (1 - pReducao);
         const baseCalculoServ = fatServ * 0.32 * fatorReducaoBase;
         const baseCalculoVend = fatVend * 0.08 * fatorReducaoBase;
@@ -392,7 +406,7 @@
 
         const totalLucroPresumido = totalIRPJ + totalCSLL + cbsLiquido + icmsLiquido + totalISS;
 
-        // EXIBIÇÃO NOS QUADROS PRINCIPAIS
+        // EXIBIÇÃO VALORES
         document.getElementById('simplesPuroVal').innerText = "R$ " + impostoSimplesPuro.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('simplesPuroPct').innerText = (aliqEfetivaSimples * 100).toFixed(2) + "%";
         document.getElementById('margemSimplesPuro').innerText = (((fatTotalMes - impostoSimplesPuro) / fatTotalMes) * 100).toFixed(2) + "%";
@@ -405,7 +419,22 @@
         document.getElementById('lucroPresumidoPct').innerText = ((totalLucroPresumido / fatTotalMes) * 100).toFixed(2) + "%";
         document.getElementById('margemLucroPresumido').innerText = (((fatTotalMes - totalLucroPresumido) / fatTotalMes) * 100).toFixed(2) + "%";
 
-        // EXIBIÇÃO DA MEMÓRIA DE CÁLCULO
+        // DESTACAR A LINHA VENCEDORA (MENOR IMPOSTO EM VERMELHO, DEMAIS EM PRETO)
+        const rowPuro = document.getElementById('rowSimplesPuro');
+        const rowHibrido = document.getElementById('rowSimplesHibrido');
+        const rowLP = document.getElementById('rowLucroPresumido');
+
+        rowPuro.className = 'text-black';
+        rowHibrido.className = 'text-black';
+        rowLP.className = 'text-black';
+
+        const menorImposto = Math.min(impostoSimplesPuro, totalSimplesHibrido, totalLucroPresumido);
+
+        if (menorImposto === impostoSimplesPuro) rowPuro.className = 'row-winner';
+        else if (menorImposto === totalSimplesHibrido) rowHibrido.className = 'row-winner';
+        else rowLP.className = 'row-winner';
+
+        // MEMÓRIA
         document.getElementById('memoRBT12').innerText = "RBT12: R$ " + rbt12.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('memoFaixa').innerText = (faixaIdx + 1) + "ª Faixa (Anexo " + anexoEfetivo + ")";
         document.getElementById('memoNominal').innerText = "Nominal: " + (nom * 100).toFixed(2) + "%";
@@ -418,13 +447,10 @@
         document.getElementById('valCSLL').innerText = "R$ " + totalCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('baseCBS').innerText = "Base: R$ " + fatTotalMes.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('valCBS').innerText = "R$ " + cbsLiquido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-        
         document.getElementById('baseICMS').innerText = "Vendas: R$ " + fatVend.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('valICMS').innerText = "R$ " + icmsLiquido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-        
         document.getElementById('baseISS').innerText = "Serviços: R$ " + fatServ.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('valISS').innerText = "R$ " + totalISS.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-        
         document.getElementById('valTotalLP').innerText = "R$ " + totalLucroPresumido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
     }
 
