@@ -166,7 +166,7 @@
                     <input type="number" id="aliqISS" value="5" step="0.1" oninput="calcular()">
                 </div>
                 <div class="form-group">
-                    <label>Redução LP (%)</label>
+                    <label>Redução Exclusiva CBS (%)</label>
                     <input type="number" id="percentualReducao" value="0" step="1" oninput="calcular()">
                 </div>
             </div>
@@ -259,9 +259,8 @@
                             <td>Faturamento Mês</td>
                             <td id="memoAliqEfetiva">0,00%</td>
                         </tr>
-                        <!-- NOVAS LINHAS DE DETALHAMENTO DA CBS -->
                         <tr class="text-black">
-                            <td>Base de Débito CBS e Débito Apurado</td>
+                            <td>Base de Débito CBS (c/ Redução) e Débito Apurado</td>
                             <td id="baseCBSDebito">Faturamento: R$ 0,00</td>
                             <td id="valCBSDebito">Débito: R$ 0,00</td>
                         </tr>
@@ -277,12 +276,12 @@
                         </tr>
                         <tr class="text-black">
                             <td>IRPJ Lucro Presumido (15% + Adicional 10%)</td>
-                            <td id="baseIRPJ">Base: R$ 0,00</td>
+                            <td id="baseIRPJ">Base integral: R$ 0,00</td>
                             <td id="valIRPJ">R$ 0,00</td>
                         </tr>
                         <tr class="text-black">
                             <td>CSLL Lucro Presumido (9%)</td>
-                            <td id="baseCSLL">Base: R$ 0,00</td>
+                            <td id="baseCSLL">Base integral: R$ 0,00</td>
                             <td id="valCSLL">R$ 0,00</td>
                         </tr>
                         <tr class="text-black">
@@ -343,7 +342,7 @@
         const despesasCBS = parseFloat(document.getElementById('despesasCBS').value) || 0;
 
         const aliqISSInput = (parseFloat(document.getElementById('aliqISS').value) || 0) / 100;
-        const pReducao = (parseFloat(document.getElementById('percentualReducao').value) || 0) / 100;
+        const pReducaoCBS = (parseFloat(document.getElementById('percentualReducao').value) || 0) / 100;
         const aliqIcmsSaida = (parseFloat(document.getElementById('aliqIcmsSaida').value) || 0) / 100;
         const aliqIcmsEntrada = (parseFloat(document.getElementById('aliqIcmsEntrada').value) || 0) / 100;
         const aliqCBSInput = (parseFloat(document.getElementById('aliqCBS').value) || 8) / 100;
@@ -388,9 +387,9 @@
         const aliqSimplesHibrido = aliqEfetivaSimples * (1 - parteRetiradaPct);
         const dasSimplesHibrido = fatTotalMes * aliqSimplesHibrido;
 
-        // MEMÓRIA EXATA DA CBS
+        // MEMÓRIA EXATA DA CBS (REDUÇÃO APLICADA APENAS SOBRE A CBS)
         const baseDebitoCBS = fatTotalMes;
-        const valDebitoCBS = fatTotalMes * aliqCBSInput * (1 - pReducao);
+        const valDebitoCBS = fatTotalMes * aliqCBSInput * (1 - pReducaoCBS);
         
         const baseCreditoCBS = comprasNF + despesasCBS;
         const valCreditoCBS = (comprasNF * aliqCBSInput) + (despesasCBS * aliqCBSInput);
@@ -399,10 +398,9 @@
 
         const totalSimplesHibrido = dasSimplesHibrido + cbsLiquido;
 
-        // Lucro Presumido
-        const fatorReducaoBase = (1 - pReducao);
-        const baseCalculoServ = fatServ * 0.32 * fatorReducaoBase;
-        const baseCalculoVend = fatVend * 0.08 * fatorReducaoBase;
+        // LUCRO PRESUMIDO (IRPJ E CSLL CALCULADOS INTEGRALMENTE SEM REDUÇÃO)
+        const baseCalculoServ = fatServ * 0.32;
+        const baseCalculoVend = fatVend * 0.08;
         const baseIRPJCSLL = baseCalculoServ + baseCalculoVend;
 
         const irpj15 = baseIRPJCSLL * 0.15;
@@ -411,15 +409,16 @@
 
         const totalCSLL = baseIRPJCSLL * 0.09;
 
-        const icmsDebito = fatVend * aliqIcmsSaida * fatorReducaoBase;
+        // ICMS e ISS calculados normalmente sobre suas bases
+        const icmsDebito = fatVend * aliqIcmsSaida;
         const icmsCredito = comprasNF * aliqIcmsEntrada;
         const icmsLiquido = Math.max(0, icmsDebito - icmsCredito);
 
-        const totalISS = fatServ * aliqISSInput * fatorReducaoBase;
+        const totalISS = fatServ * aliqISSInput;
 
         const totalLucroPresumido = totalIRPJ + totalCSLL + cbsLiquido + icmsLiquido + totalISS;
 
-        // EXIBIÇÃO VALORES COM 2 DÍGITOS DECIMAIS
+        // EXIBIÇÃO QUADROS
         document.getElementById('simplesPuroVal').innerText = "R$ " + impostoSimplesPuro.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('simplesPuroPct').innerText = (aliqEfetivaSimples * 100).toFixed(2) + "%";
         document.getElementById('margemSimplesPuro').innerText = (((fatTotalMes - impostoSimplesPuro) / fatTotalMes) * 100).toFixed(2) + "%";
@@ -432,7 +431,7 @@
         document.getElementById('lucroPresumidoPct').innerText = ((totalLucroPresumido / fatTotalMes) * 100).toFixed(2) + "%";
         document.getElementById('margemLucroPresumido').innerText = (((fatTotalMes - totalLucroPresumido) / fatTotalMes) * 100).toFixed(2) + "%";
 
-        // DESTACAR O MENOR IMPOSTO EM VERMELHO
+        // DESTACAR MENOR IMPOSTO
         const rowPuro = document.getElementById('rowSimplesPuro');
         const rowHibrido = document.getElementById('rowSimplesHibrido');
         const rowLP = document.getElementById('rowLucroPresumido');
@@ -454,16 +453,15 @@
         document.getElementById('memoDeducao').innerText = "Dedução: R$ " + ded.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('memoAliqEfetiva').innerText = (aliqEfetivaSimples * 100).toFixed(2) + "%";
 
-        // DETALHAMENTO DA MEMÓRIA DE CBS
         document.getElementById('baseCBSDebito').innerText = "Base Débito: R$ " + baseDebitoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valCBSDebito').innerText = "Débito: R$ " + valDebitoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('baseCBSCredito').innerText = "Base Crédito: R$ " + baseCreditoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valCBSCredito').innerText = "Crédito: R$ " + valCreditoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valCBSLiquido').innerText = "R$ " + cbsLiquido.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-        document.getElementById('baseIRPJ').innerText = "Base: R$ " + baseIRPJCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('baseIRPJ').innerText = "Base Integral: R$ " + baseIRPJCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valIRPJ').innerText = "R$ " + totalIRPJ.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('baseCSLL').innerText = "Base: R$ " + baseIRPJCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('baseCSLL').innerText = "Base Integral: R$ " + baseIRPJCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valCSLL').innerText = "R$ " + totalCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
         document.getElementById('baseICMS').innerText = "Vendas: R$ " + fatVend.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
