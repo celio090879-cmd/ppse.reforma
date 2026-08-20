@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPSE - Comparador Tributário Interativo</title>
+    <title>PPSE - Comparador Tributário Avançado</title>
     <style>
         :root {
             --ppse-orange: #DA3E1B;
@@ -18,7 +18,7 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         body { background-color: var(--ppse-light-bg); color: var(--text-dark); padding: 25px 15px; line-height: 1.5; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1250px; margin: 0 auto; }
         
         header {
             background-color: var(--card-white);
@@ -30,7 +30,7 @@
         header h1 span { color: var(--ppse-orange); }
         header p { color: var(--ppse-medium-gray); font-size: 0.98rem; }
 
-        .layout-grid { display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
+        .layout-grid { display: grid; grid-template-columns: 370px 1fr; gap: 20px; }
         @media (max-width: 900px) { .layout-grid { grid-template-columns: 1fr; } }
 
         .card {
@@ -54,6 +54,8 @@
             transition: border-color 0.2s;
         }
         input:focus, select:focus { outline: none; border-color: var(--ppse-orange); }
+
+        .highlight-input { border-left: 3px solid var(--ppse-orange); }
 
         .btn-calc {
             width: 100%; background: var(--ppse-orange); color: white; border: none;
@@ -86,12 +88,12 @@
 
 <div class="container">
     <header>
-        <h1>PPSE <span>Contábil</span> - Comparador Tributário</h1>
-        <p>Diagnóstico Interativo: Simples Nacional, Reforma Tributária (CBS/IBS) e Lucro Presumido</p>
+        <h1>PPSE <span>Contábil</span> - Comparador Tributário Misto</h1>
+        <p>Ajuste Fino de Alíquotas: ISS Personalizado, ICMS Entrada/Saída e Segregação de Operações</p>
     </header>
 
     <div class="layout-grid">
-        <!-- FORMULÁRIO DE ENTRADAS -->
+        <!-- FORMULÁRIO DE PARÂMETROS -->
         <div class="card">
             <h2>Parâmetros Fiscais</h2>
             
@@ -106,23 +108,24 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>Faturamento Mensal Vendas (R$)</label>
-                <input type="number" id="fatVendas" value="15000" oninput="calcular()">
-            </div>
-
-            <div class="form-group">
-                <label>Faturamento Mensal Serviços (R$)</label>
-                <input type="number" id="fatServicos" value="0" oninput="calcular()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Faturamento Vendas (R$)</label>
+                    <input type="number" id="fatVendas" value="15000" oninput="calcular()">
+                </div>
+                <div class="form-group">
+                    <label>Faturamento Serviços (R$)</label>
+                    <input type="number" id="fatServicos" value="30000" oninput="calcular()">
+                </div>
             </div>
 
             <div class="form-group">
                 <label>Folha / Pró-Labore Mensal (R$)</label>
-                <input type="number" id="folhaMensal" value="0" oninput="calcular()">
+                <input type="number" id="folhaMensal" value="12600" oninput="calcular()">
             </div>
 
             <div class="form-group">
-                <label>Compras c/ NF (Crédito de ICMS/CBS) (R$)</label>
+                <label>Compras c/ NF (Base Crédito ICMS) (R$)</label>
                 <input type="number" id="comprasNF" value="4500" oninput="calcular()">
             </div>
 
@@ -131,10 +134,16 @@
                 <input type="number" id="despesasCBS" value="2250" oninput="calcular()">
             </div>
 
-            <!-- DADOS PERSONALIZADOS -->
-            <div class="form-group">
-                <label>Percentual de Redução da Base / Alíquota (%)</label>
-                <input type="number" id="percentualReducao" value="0" min="0" max="100" step="1" oninput="calcular()" placeholder="Ex: 0, 30, 60">
+            <!-- PARÂMETROS DE ALÍQUOTAS DESTACADOS -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Alíquota ISS Serviços (%)</label>
+                    <input type="number" class="highlight-input" id="aliqISS" value="5" step="0.1" min="0" max="5" oninput="calcular()" placeholder="Ex: 2, 3, 5">
+                </div>
+                <div class="form-group">
+                    <label>Redução Setorial (%)</label>
+                    <input type="number" id="percentualReducao" value="0" min="0" max="100" step="1" oninput="calcular()" placeholder="Ex: 0, 30, 60">
+                </div>
             </div>
 
             <div class="form-row">
@@ -162,7 +171,7 @@
                 <h2>Análise do Fator R</h2>
                 <div class="fator-r-box">
                     <p>Fator R Calculado: <strong id="fatorRPct">0,00%</strong> (Folha / Faturamento Acumulado 12 Meses)</p>
-                    <div id="fatorRBadge" class="status-badge badge-anexo3">Enquadrado no Anexo I</div>
+                    <div id="fatorRBadge" class="status-badge badge-anexo3">Enquadrado no Anexo III</div>
                 </div>
 
                 <h2>Resumo Comparativo dos Regimes</h2>
@@ -200,7 +209,7 @@
 
             <!-- DETALHAMENTO DO LUCRO PRESUMIDO -->
             <div class="card">
-                <h2>Memória do Lucro Presumido (com ICMS Entrada/Saída)</h2>
+                <h2>Memória de Cálculo - Lucro Presumido (Misto)</h2>
                 <table>
                     <thead>
                         <tr>
@@ -226,12 +235,12 @@
                             <td id="valCBS">R$ 0,00</td>
                         </tr>
                         <tr>
-                            <td>ICMS Líquido (Débito Vendas - Crédito Compras)</td>
+                            <td>ICMS Líquido (Exclusivo sobre Vendas)</td>
                             <td id="baseICMS">R$ 0,00</td>
                             <td id="valICMS">R$ 0,00</td>
                         </tr>
                         <tr>
-                            <td>ISS Líquido (com Redução)</td>
+                            <td>ISS Líquido (Exclusivo sobre Serviços)</td>
                             <td id="baseISS">R$ 0,00</td>
                             <td id="valISS">R$ 0,00</td>
                         </tr>
@@ -247,7 +256,7 @@
     </div>
 
     <footer>
-        <p>PPSE Contábil | Diagnóstico Tributário Inteligente</p>
+        <p>PPSE Contábil & contabilidadeja.com | Diagnóstico Tributário Inteligente</p>
     </footer>
 </div>
 
@@ -278,6 +287,7 @@
         const comprasNF = parseFloat(document.getElementById('comprasNF').value) || 0;
         const despesasCBS = parseFloat(document.getElementById('despesasCBS').value) || 0;
 
+        const aliqISSInput = (parseFloat(document.getElementById('aliqISS').value) || 0) / 100;
         const pReducao = (parseFloat(document.getElementById('percentualReducao').value) || 0) / 100;
         const aliqIcmsSaida = (parseFloat(document.getElementById('aliqIcmsSaida').value) || 0) / 100;
         const aliqIcmsEntrada = (parseFloat(document.getElementById('aliqIcmsEntrada').value) || 0) / 100;
@@ -342,12 +352,14 @@
 
         const totalCSLL = baseIRPJCSLL * 0.09;
 
-        // ICMS Entrada x Saída
+        // ICMS Apenas sobre Vendas (Comunicação/Comércio)
         const icmsDebito = fatVend * aliqIcmsSaida * fatorReducaoBase;
         const icmsCredito = comprasNF * aliqIcmsEntrada;
         const icmsLiquido = Math.max(0, icmsDebito - icmsCredito);
 
-        const totalISS = fatServ * 0.05 * fatorReducaoBase;
+        // ISS Apenas sobre Serviços
+        const totalISS = fatServ * aliqISSInput * fatorReducaoBase;
+
         const totalLucroPresumido = totalIRPJ + totalCSLL + cbsLiquido + icmsLiquido + totalISS;
 
         // Exibição dos Quadros
@@ -370,10 +382,13 @@
         document.getElementById('valCSLL').innerText = "R$ " + totalCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('baseCBS').innerText = "R$ " + fatTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('valCBS').innerText = "R$ " + cbsLiquido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        
         document.getElementById('baseICMS').innerText = "Vendas: R$ " + fatVend.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('valICMS').innerText = "R$ " + icmsLiquido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        
         document.getElementById('baseISS').innerText = "Serviços: R$ " + fatServ.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('valISS').innerText = "R$ " + totalISS.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        
         document.getElementById('valTotalLP').innerText = "R$ " + totalLucroPresumido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
     }
 
