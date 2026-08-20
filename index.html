@@ -3,292 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexo Fiscal - Comparador Tributário</title>
+    <title>Nexo Fiscal - Comparador Tributário Completo</title>
     <style>
         :root {
             --primary-blue: #0b2545;
             --accent-gold: #c5a059;
             --light-bg: #f4f6f9;
             --card-white: #ffffff;
-            --border-color: #e2e8f0;
-            --text-dark: #2d3748;
+            --border-color: #cbd5e1;
+            --text-dark: #1e293b;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        body {
-            background-color: var(--light-bg);
-            color: var(--text-dark);
-            line-height: 1.6;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--light-bg); color: var(--text-dark); padding: 20px; line-height: 1.5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
         header {
             background: linear-gradient(135deg, var(--primary-blue), #133c6d);
-            color: white;
-            padding: 30px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            color: white; padding: 25px 30px; border-radius: 12px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 25px;
         }
+        header h1 { font-size: 2.2rem; margin-bottom: 5px; }
+        header p { color: #cbd5e1; font-size: 1rem; }
 
-        header h1 {
-            font-size: 2rem;
-            margin-bottom: 8px;
-        }
-
-        header p {
-            color: #cbd5e1;
-            font-size: 1.05rem;
-        }
-
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1fr 1.4fr;
-            gap: 25px;
-        }
-
-        @media (max-width: 768px) {
-            .grid-layout {
-                grid-template-columns: 1fr;
-            }
-        }
+        .layout-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+        @media (max-width: 900px) { .layout-grid { grid-template-columns: 1fr; } }
 
         .card {
-            background: var(--card-white);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border: 1px solid var(--border-color);
-        }
-
-        .card h2 {
-            font-size: 1.3rem;
-            color: var(--primary-blue);
+            background: var(--card-white); border-radius: 10px; padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border-color);
             margin-bottom: 20px;
-            border-bottom: 2px solid var(--accent-gold);
-            padding-bottom: 8px;
+        }
+        .card h2 {
+            font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;
+            border-bottom: 2px solid var(--accent-gold); padding-bottom: 6px;
         }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 0.92rem;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 4px; color: #334155; }
+        input, select {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color);
+            border-radius: 6px; font-size: 0.95rem; background: #fff;
         }
 
         .btn-calc {
-            width: 100%;
-            background-color: var(--primary-blue);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 6px;
-            font-size: 1.05rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 10px;
+            width: 100%; background: var(--primary-blue); color: white; border: none;
+            padding: 12px; border-radius: 6px; font-weight: bold; font-size: 1rem;
+            cursor: pointer; margin-top: 10px; transition: 0.2s;
         }
+        .btn-calc:hover { background: #133c6d; }
 
-        .btn-calc:hover {
-            background-color: #133c6d;
+        .fator-r-box {
+            background: #f8fafc; border-left: 4px solid var(--accent-gold); padding: 15px;
+            border-radius: 0 8px 8px 0; margin-bottom: 20px;
         }
-
-        .result-box {
-            background-color: #f8fafc;
-            border-left: 4px solid var(--accent-gold);
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 0 8px 8px 0;
-        }
-
         .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            margin-top: 8px;
+            display: inline-block; padding: 4px 12px; border-radius: 15px; font-weight: bold;
+            font-size: 0.82rem; margin-top: 6px;
         }
+        .badge-anexo3 { background-color: #dcfce7; color: #166534; }
+        .badge-anexo5 { background-color: #fee2e2; color: #991b1b; }
 
-        .badge-anexo3 { background-color: #e8f5e9; color: #2e7d32; }
-        .badge-anexo5 { background-color: #ffebee; color: #c62828; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background: #f1f5f9; color: var(--primary-blue); font-weight: 700; }
+        .highlight-row { background-color: #f0f9ff; font-weight: bold; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.95rem;
-        }
-
-        th {
-            background-color: #f1f5f9;
-            color: var(--primary-blue);
-        }
-
-        .highlight-row {
-            background-color: #f0f9ff;
-            font-weight: bold;
-        }
-
-        footer {
-            margin-top: 40px;
-            text-align: center;
-            color: #64748b;
-            font-size: 0.88rem;
-        }
+        footer { text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 30px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>Nexo Fiscal - Comparador Tributário</h1>
-        <p>Simule o impacto do Fator R, Simples Híbrido (Reforma Tributária) e Lucro Presumido</p>
+        <h1>Nexo Fiscal - Comparador Tributário Completo</h1>
+        <p>Simulação Técnica de Transição: Simples Nacional, Reforma Tributária (CBS/IBS) e Lucro Presumido</p>
     </header>
 
-    <div class="grid-layout">
+    <div class="layout-grid">
+        <!-- FORMULÁRIO COM TODAS AS VARIÁVEIS DA PLANILHA -->
         <div class="card">
-            <h2>Simulação de Dados</h2>
+            <h2>Parâmetros Fiscais</h2>
             
             <div class="form-group">
-                <label for="faturamentoMensal">Faturamento Mensal Médio (R$)</label>
-                <input type="number" id="faturamentoMensal" value="30000">
+                <label>Anexo / Atividade do Simples</label>
+                <select id="anexoSelect" onchange="calcular()">
+                    <option value="I">Anexo I - Comércio</option>
+                    <option value="II">Anexo II - Indústria</option>
+                    <option value="III">Anexo III - Serviços</option>
+                    <option value="IV">Anexo IV - Serviços Esp.</option>
+                    <option value="V" selected>Anexo V - Serviços (com Fator R)</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label for="folhaMensal">Folha / Pró-Labore Mensal (R$)</label>
-                <input type="number" id="folhaMensal" value="8400">
+                <label>Faturamento Mensal Serviços (R$)</label>
+                <input type="number" id="fatServicos" value="300000" oninput="calcular()">
             </div>
 
             <div class="form-group">
-                <label for="despesasCBS">Despesas com Crédito de CBS (R$)</label>
-                <input type="number" id="despesasCBS" value="4500">
+                <label>Faturamento Mensal Vendas (R$)</label>
+                <input type="number" id="fatVendas" value="0" oninput="calcular()">
             </div>
 
-            <button class="btn-calc" onclick="calcular()">Calcular Comparativo</button>
+            <div class="form-group">
+                <label>Folha + Pró-Labore Mensal (R$)</label>
+                <input type="number" id="folhaMensal" value="84000" oninput="calcular()">
+            </div>
+
+            <div class="form-group">
+                <label>Compras c/ Nota Fiscal (Crédito ICMS) (R$)</label>
+                <input type="number" id="comprasNF" value="0" oninput="calcular()">
+            </div>
+
+            <div class="form-group">
+                <label>Despesas c/ Crédito de CBS (15%) (R$)</label>
+                <input type="number" id="despesasCBS" value="50000" oninput="calcular()">
+            </div>
+
+            <div class="form-group">
+                <label>Alíquota do CBS (%)</label>
+                <input type="number" id="aliqCBS" value="8" step="0.1" oninput="calcular()">
+            </div>
+
+            <div class="form-group">
+                <label>Redução de Base no Lucro Presumido</label>
+                <select id="reducaoLP" onchange="calcular()">
+                    <option value="0">Sem Redução (Normal)</option>
+                    <option value="0.30">30% de Redução</option>
+                    <option value="0.60">60% de Redução (Médicos / Saúde)</option>
+                </select>
+            </div>
+
+            <button class="btn-calc" onclick="calcular()">Recalcular Diagnóstico</button>
         </div>
 
-        <div class="card">
-            <h2>Resultado da Análise</h2>
+        <!-- QUADRO DE RESULTADOS & MEMÓRIA DE CÁLCULO -->
+        <div>
+            <div class="card">
+                <h2>Análise do Fator R & Enquadramento</h2>
+                <div class="fator-r-box">
+                    <p>Fator R Acumulado: <strong id="fatorRPct">28,00%</strong> (Folha / Faturamento 12 Meses)</p>
+                    <div id="fatorRBadge" class="status-badge badge-anexo3">Enquadrado no Anexo III</div>
+                </div>
 
-            <div class="result-box">
-                <h3>Análise do Fator R</h3>
-                <p>Proporção Folha / Faturamento: <strong id="fatorRVal">28,00%</strong></p>
-                <div id="fatorRBadge" class="status-badge badge-anexo3">Enquadrado no Anexo III</div>
+                <h2>Resumo Comparativo de Impostos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Regime Tributário</th>
+                            <th>Imposto Mensal</th>
+                            <th>Alíquota Efetiva</th>
+                            <th>Margem Bruta Est.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Simples Nacional Tradicional</td>
+                            <td id="simplesPuroVal">R$ 0,00</td>
+                            <td id="simplesPuroPct">0,00%</td>
+                            <td id="margemSimplesPuro">0,00%</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td>Simples Híbrido + CBS (Reforma)</td>
+                            <td id="simplesHibridoVal">R$ 0,00</td>
+                            <td id="simplesHibridoPct">0,00%</td>
+                            <td id="margemSimplesHibrido">0,00%</td>
+                        </tr>
+                        <tr>
+                            <td>Lucro Presumido (Com Reduções)</td>
+                            <td id="lucroPresumidoVal">R$ 0,00</td>
+                            <td id="lucroPresumidoPct">0,00%</td>
+                            <td id="margemLucroPresumido">0,00%</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Regime Tributário</th>
-                        <th>Imposto Mensal</th>
-                        <th>Alíquota Efetiva</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Simples Nacional Tradicional</td>
-                        <td id="simplesPuroR$">R$ 0,00</td>
-                        <td id="simplesPuroPct">0,00%</td>
-                    </tr>
-                    <tr class="highlight-row">
-                        <td>Simples Híbrido + CBS</td>
-                        <td id="simplesHibridoR$">R$ 0,00</td>
-                        <td id="simplesHibridoPct">0,00%</td>
-                    </tr>
-                    <tr>
-                        <td>Lucro Presumido</td>
-                        <td id="lucroPresumidoR$">R$ 0,00</td>
-                        <td id="lucroPresumidoPct">12,01%</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="card">
+                <h2>Detalhamento Memória de Cálculo - Lucro Presumido</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tributo / Base</th>
+                            <th>Base de Cálculo</th>
+                            <th>Valor a Recolher</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>IRPJ (15% + Adicional 10%)</td>
+                            <td id="baseIRPJ">R$ 0,00</td>
+                            <td id="valIRPJ">R$ 0,00</td>
+                        </tr>
+                        <tr>
+                            <td>CSLL (9%)</td>
+                            <td id="baseCSLL">R$ 0,00</td>
+                            <td id="valCSLL">R$ 0,00</td>
+                        </tr>
+                        <tr>
+                            <td>CBS Líquido (Débito - Crédito)</td>
+                            <td id="baseCBS">R$ 0,00</td>
+                            <td id="valCBS">R$ 0,00</td>
+                        </tr>
+                        <tr>
+                            <td>ISS / ICMS Líquido</td>
+                            <td id="baseISSS">R$ 0,00</td>
+                            <td id="valISS">R$ 0,00</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td>Total Lucro Presumido</td>
+                            <td>-</td>
+                            <td id="valTotalLP">R$ 0,00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <footer>
-        <p>PPSE Contábil & contabilidadeja.com | Análise fiscal inteligente</p>
+        <p>PPSE Contábil & contabilidadeja.com | Desenvolvido para Diagnóstico Fiscal Estratégico</p>
     </footer>
 </div>
 
 <script>
     function calcular() {
-        const fat = parseFloat(document.getElementById('faturamentoMensal').value) || 0;
+        const fatServ = parseFloat(document.getElementById('fatServicos').value) || 0;
+        const fatVend = parseFloat(document.getElementById('fatVendas').value) || 0;
+        const fatTotal = fatServ + fatVend;
         const folha = parseFloat(document.getElementById('folhaMensal').value) || 0;
         const despesasCBS = parseFloat(document.getElementById('despesasCBS').value) || 0;
+        const aliqCBSInput = (parseFloat(document.getElementById('aliqCBS').value) || 8) / 100;
+        const reducaoLP = parseFloat(document.getElementById('reducaoLP').value) || 0;
+        const anexoSelected = document.getElementById('anexoSelect').value;
 
-        const rbt12 = fat * 12;
+        if (fatTotal === 0) return;
+
+        // 1. Fator R
+        const rbt12 = fatTotal * 12;
         const folha12 = folha * 12;
         const fatorR = rbt12 > 0 ? (folha12 / rbt12) : 0;
+        document.getElementById('fatorRPct').innerText = (fatorR * 100).toFixed(2) + "%";
 
-        document.getElementById('fatorRVal').innerText = (fatorR * 100).toFixed(2) + "%";
+        let anexoEfetivo = anexoSelected;
         const badge = document.getElementById('fatorRBadge');
-        
-        let aliqSimplesPuro = 0;
-        if (fatorR >= 0.28) {
-            badge.innerText = "Enquadrado no Anexo III (Mais Vantajoso)";
-            badge.className = "status-badge badge-anexo3";
-            if (rbt12 <= 180000) aliqSimplesPuro = 0.06;
-            else if (rbt12 <= 360000) aliqSimplesPuro = 0.086;
-            else if (rbt12 <= 720000) aliqSimplesPuro = 0.1105;
-            else aliqSimplesPuro = 0.1402;
+
+        if (anexoSelected === 'V') {
+            if (fatorR >= 0.28) {
+                anexoEfetivo = 'III';
+                badge.innerText = "Migrou para o Anexo III via Fator R (Redução de Carga Fiscal)";
+                badge.className = "status-badge badge-anexo3";
+            } else {
+                badge.innerText = "Permanece no Anexo V (Fator R < 28%)";
+                badge.className = "status-badge badge-anexo5";
+            }
         } else {
-            badge.innerText = "Enquadrado no Anexo V (Carga Fiscal Superior)";
-            badge.className = "status-badge badge-anexo5";
-            if (rbt12 <= 180000) aliqSimplesPuro = 0.155;
-            else if (rbt12 <= 360000) aliqSimplesPuro = 0.1675;
-            else if (rbt12 <= 720000) aliqSimplesPuro = 0.1785;
-            else aliqSimplesPuro = 0.1955;
+            badge.innerText = "Atividade enquadrada no Anexo " + anexoSelected;
+            badge.className = "status-badge badge-anexo3";
         }
 
-        const impostoSimplesPuro = fat * aliqSimplesPuro;
-        const cbsDebito = fat * 0.093;
-        const cbsCredito = despesasCBS * 0.093;
+        // 2. Alíquotas do Simples Nacional Puro
+        let aliqSimplesPuro = 0.06;
+        if (anexoEfetivo === 'I') aliqSimplesPuro = rbt12 <= 180000 ? 0.04 : (rbt12 <= 360000 ? 0.0565 : 0.07575);
+        else if (anexoEfetivo === 'II') aliqSimplesPuro = rbt12 <= 180000 ? 0.045 : (rbt12 <= 360000 ? 0.0625 : 0.08075);
+        else if (anexoEfetivo === 'III') aliqSimplesPuro = rbt12 <= 180000 ? 0.06 : (rbt12 <= 360000 ? 0.086 : (rbt12 <= 720000 ? 0.1105 : 0.1751));
+        else if (anexoEfetivo === 'IV') aliqSimplesPuro = rbt12 <= 180000 ? 0.045 : (rbt12 <= 360000 ? 0.0675 : 0.0813);
+        else if (anexoEfetivo === 'V') aliqSimplesPuro = rbt12 <= 180000 ? 0.155 : (rbt12 <= 360000 ? 0.1675 : (rbt12 <= 720000 ? 0.1785 : 0.21275));
+
+        const impostoSimplesPuro = fatTotal * aliqSimplesPuro;
+
+        // 3. Simples Híbrido (CBS/IBS da Reforma Tributária)
+        const cbsDebito = fatTotal * aliqCBSInput;
+        const cbsCredito = despesasCBS * aliqCBSInput;
         const cbsLiquido = Math.max(0, cbsDebito - cbsCredito);
         const impostoSimplesHibrido = (impostoSimplesPuro * 0.7) + cbsLiquido;
-        const impostoLP = fat * 0.12005;
 
-        document.getElementById('simplesPuroR$').innerText = "R$ " + impostoSimplesPuro.toFixed(2);
+        // 4. Lucro Presumido Memória de Cálculo
+        const baseCalculoServ = fatServ * 0.32 * (1 - reducaoLP);
+        const baseCalculoVend = fatVend * 0.08;
+        const baseIRPJCSLL = baseCalculoServ + baseCalculoVend;
+
+        const irpjNormal = baseIRPJCSLL * 0.15;
+        const irpjAdicional = Math.max(0, (baseIRPJCSLL - 20000) * 0.10);
+        const irpjTotal = irpjNormal + irpjAdicional;
+
+        const csllTotal = baseIRPJCSLL * 0.09;
+        const issTotal = fatServ * 0.05 * (1 - reducaoLP);
+
+        const totalLP = irpjTotal + csllTotal + cbsLiquido + issTotal;
+
+        // Exibição do Resumo
+        document.getElementById('simplesPuroVal').innerText = "R$ " + impostoSimplesPuro.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         document.getElementById('simplesPuroPct').innerText = (aliqSimplesPuro * 100).toFixed(2) + "%";
-        document.getElementById('simplesHibridoR$').innerText = "R$ " + impostoSimplesHibrido.toFixed(2);
-        document.getElementById('simplesHibridoPct').innerText = ((impostoSimplesHibrido / fat) * 100).toFixed(2) + "%";
-        document.getElementById('lucroPresumidoR$').innerText = "R$ " + impostoLP.toFixed(2);
+        document.getElementById('margemSimplesPuro').innerText = (((fatTotal - impostoSimplesPuro) / fatTotal) * 100).toFixed(2) + "%";
+
+        document.getElementById('simplesHibridoVal').innerText = "R$ " + impostoSimplesHibrido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('simplesHibridoPct').innerText = ((impostoSimplesHibrido / fatTotal) * 100).toFixed(2) + "%";
+        document.getElementById('margemSimplesHibrido').innerText = (((fatTotal - impostoSimplesHibrido) / fatTotal) * 100).toFixed(2) + "%";
+
+        document.getElementById('lucroPresumidoVal').innerText = "R$ " + totalLP.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('lucroPresumidoPct').innerText = ((totalLP / fatTotal) * 100).toFixed(2) + "%";
+        document.getElementById('margemLucroPresumido').innerText = (((fatTotal - totalLP) / fatTotal) * 100).toFixed(2) + "%";
+
+        // Exibição da Memória LP
+        document.getElementById('baseIRPJ').innerText = "R$ " + baseIRPJCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('valIRPJ').innerText = "R$ " + irpjTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('baseCSLL').innerText = "R$ " + baseIRPJCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('valCSLL').innerText = "R$ " + csllTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('baseCBS').innerText = "R$ " + fatTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('valCBS').innerText = "R$ " + cbsLiquido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('baseISSS').innerText = "R$ " + fatServ.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('valISS').innerText = "R$ " + issTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('valTotalLP').innerText = "R$ " + totalLP.toLocaleString('pt-BR', {minimumFractionDigits: 2});
     }
 
     calcular();
