@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexo Fiscal - Comparador Tributário</title>
+    <style>
+        :root {
+            --primary-blue: #0b2545;
+            --accent-gold: #c5a059;
+            --light-bg: #f4f6f9;
+            --card-white: #ffffff;
+            --border-color: #e2e8f0;
+            --text-dark: #2d3748;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-blue), #133c6d);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #cbd5e1;
+            font-size: 1.05rem;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent-gold);
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.92rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:hover {
+            background-color: #133c6d;
+        }
+
+        .result-box {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--accent-gold);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .badge-anexo3 { background-color: #e8f5e9; color: #2e7d32; }
+        .badge-anexo5 { background-color: #ffebee; color: #c62828; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary-blue);
+        }
+
+        .highlight-row {
+            background-color: #f0f9ff;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.88rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Nexo Fiscal - Comparador Tributário</h1>
+        <p>Simule o impacto do Fator R, Simples Híbrido (Reforma Tributária) e Lucro Presumido</p>
+    </header>
+
+    <div class="grid-layout">
+        <div class="card">
+            <h2>Simulação de Dados</h2>
+            
+            <div class="form-group">
+                <label for="faturamentoMensal">Faturamento Mensal Médio (R$)</label>
+                <input type="number" id="faturamentoMensal" value="30000">
+            </div>
+
+            <div class="form-group">
+                <label for="folhaMensal">Folha / Pró-Labore Mensal (R$)</label>
+                <input type="number" id="folhaMensal" value="8400">
+            </div>
+
+            <div class="form-group">
+                <label for="despesasCBS">Despesas com Crédito de CBS (R$)</label>
+                <input type="number" id="despesasCBS" value="4500">
+            </div>
+
+            <button class="btn-calc" onclick="calcular()">Calcular Comparativo</button>
+        </div>
+
+        <div class="card">
+            <h2>Resultado da Análise</h2>
+
+            <div class="result-box">
+                <h3>Análise do Fator R</h3>
+                <p>Proporção Folha / Faturamento: <strong id="fatorRVal">28,00%</strong></p>
+                <div id="fatorRBadge" class="status-badge badge-anexo3">Enquadrado no Anexo III</div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Regime Tributário</th>
+                        <th>Imposto Mensal</th>
+                        <th>Alíquota Efetiva</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Simples Nacional Tradicional</td>
+                        <td id="simplesPuroR$">R$ 0,00</td>
+                        <td id="simplesPuroPct">0,00%</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>Simples Híbrido + CBS</td>
+                        <td id="simplesHibridoR$">R$ 0,00</td>
+                        <td id="simplesHibridoPct">0,00%</td>
+                    </tr>
+                    <tr>
+                        <td>Lucro Presumido</td>
+                        <td id="lucroPresumidoR$">R$ 0,00</td>
+                        <td id="lucroPresumidoPct">12,01%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>PPSE Contábil & contabilidadeja.com | Análise fiscal inteligente</p>
+    </footer>
+</div>
+
+<script>
+    function calcular() {
+        const fat = parseFloat(document.getElementById('faturamentoMensal').value) || 0;
+        const folha = parseFloat(document.getElementById('folhaMensal').value) || 0;
+        const despesasCBS = parseFloat(document.getElementById('despesasCBS').value) || 0;
+
+        const rbt12 = fat * 12;
+        const folha12 = folha * 12;
+        const fatorR = rbt12 > 0 ? (folha12 / rbt12) : 0;
+
+        document.getElementById('fatorRVal').innerText = (fatorR * 100).toFixed(2) + "%";
+        const badge = document.getElementById('fatorRBadge');
+        
+        let aliqSimplesPuro = 0;
+        if (fatorR >= 0.28) {
+            badge.innerText = "Enquadrado no Anexo III (Mais Vantajoso)";
+            badge.className = "status-badge badge-anexo3";
+            if (rbt12 <= 180000) aliqSimplesPuro = 0.06;
+            else if (rbt12 <= 360000) aliqSimplesPuro = 0.086;
+            else if (rbt12 <= 720000) aliqSimplesPuro = 0.1105;
+            else aliqSimplesPuro = 0.1402;
+        } else {
+            badge.innerText = "Enquadrado no Anexo V (Carga Fiscal Superior)";
+            badge.className = "status-badge badge-anexo5";
+            if (rbt12 <= 180000) aliqSimplesPuro = 0.155;
+            else if (rbt12 <= 360000) aliqSimplesPuro = 0.1675;
+            else if (rbt12 <= 720000) aliqSimplesPuro = 0.1785;
+            else aliqSimplesPuro = 0.1955;
+        }
+
+        const impostoSimplesPuro = fat * aliqSimplesPuro;
+        const cbsDebito = fat * 0.093;
+        const cbsCredito = despesasCBS * 0.093;
+        const cbsLiquido = Math.max(0, cbsDebito - cbsCredito);
+        const impostoSimplesHibrido = (impostoSimplesPuro * 0.7) + cbsLiquido;
+        const impostoLP = fat * 0.12005;
+
+        document.getElementById('simplesPuroR$').innerText = "R$ " + impostoSimplesPuro.toFixed(2);
+        document.getElementById('simplesPuroPct').innerText = (aliqSimplesPuro * 100).toFixed(2) + "%";
+        document.getElementById('simplesHibridoR$').innerText = "R$ " + impostoSimplesHibrido.toFixed(2);
+        document.getElementById('simplesHibridoPct').innerText = ((impostoSimplesHibrido / fat) * 100).toFixed(2) + "%";
+        document.getElementById('lucroPresumidoR$').innerText = "R$ " + impostoLP.toFixed(2);
+    }
+
+    calcular();
+</script>
+
+</body>
+</html>
