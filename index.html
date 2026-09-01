@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPSE Contábil - Comparador Tributário Oficial</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --ppse-orange: #DA3E1B;
@@ -17,8 +18,8 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--ppse-light-bg); color: var(--text-dark); padding: 20px 15px; line-height: 1.4; }
-        .container { max-width: 1250px; margin: 0 auto; }
+        body { background-color: var(--ppse-light-bg); color: var(--text-dark); padding: 20px 15px; line-height: 1.4; min-height: 100vh; position: relative; }
+        .container { max-width: 1250px; margin: 0 auto; padding-bottom: 60px; }
         
         header {
             background-color: var(--card-white);
@@ -85,16 +86,70 @@
 
         footer { text-align: center; color: var(--ppse-medium-gray); font-size: 0.8rem; margin-top: 20px; }
 
+        /* Widget Contador Flutuante */
+        .floating-counter {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            z-index: 999;
+            background: var(--ppse-dark-gray);
+            color: #FFFFFF;
+            padding: 10px 16px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.18);
+            border: 1px solid #595959;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: inherit;
+            transition: transform 0.2s ease;
+        }
+        .floating-counter:hover {
+            transform: scale(1.04);
+        }
+        .floating-counter-icon {
+            background: rgba(218, 62, 27, 0.2);
+            color: var(--ppse-orange);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .floating-counter-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .floating-counter-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #d1d5db;
+            font-weight: 600;
+        }
+        .floating-counter-value {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+        .floating-counter-sub {
+            font-size: 0.65rem;
+            color: #9ca3af;
+        }
+
         @media print {
             @page { size: A4 portrait; margin: 6mm; }
             body { background: #fff !important; padding: 0 !important; font-size: 9.5px !important; }
-            .container { max-width: 100% !important; margin: 0 !important; }
+            .container { max-width: 100% !important; margin: 0 !important; padding-bottom: 0 !important; }
             header { padding: 6px 12px !important; margin-bottom: 8px !important; border-top-width: 3px !important; }
             .header-logo img { height: 32px !important; }
             .header-title h1 { font-size: 1.1rem !important; }
             .layout-grid { display: grid !important; grid-template-columns: 280px 1fr !important; gap: 8px !important; }
             .card { padding: 8px !important; margin-bottom: 6px !important; box-shadow: none !important; border: 1px solid #ccc !important; }
-            .btn-calc, .btn-print, footer { display: none !important; }
+            .btn-calc, .btn-print, footer, .floating-counter, .no-print { display: none !important; }
             .fator-r-box { padding: 5px 8px !important; margin-bottom: 6px !important; }
             th, td { padding: 4px 6px !important; font-size: 8.5px !important; }
         }
@@ -234,7 +289,7 @@
             </div>
 
             <div class="card">
-                <h2>Memória de Cálculo - Simples Nacional Puro, Hibrido & Lucro Presumido</h2>
+                <h2>Memória de Cálculo - Simples Nacional Puro, Híbrido & Lucro Presumido</h2>
                 <table>
                     <thead>
                         <tr>
@@ -260,12 +315,12 @@
                             <td id="memoAliqEfetiva">0,00%</td>
                         </tr>
                         <tr class="text-black">
-                            <td>Base de Débito CBS (c/ Redução) e Débito Apurado</td>
-                            <td id="baseCBSDebito">Faturamento: R$ 0,00</td>
+                            <td>Base de Débito CBS (Excluídos ISS/ICMS e c/ Redução)</td>
+                            <td id="baseCBSDebito">Líquida: R$ 0,00</td>
                             <td id="valCBSDebito">Débito: R$ 0,00</td>
                         </tr>
                         <tr class="text-black">
-                            <td>Base de Créditos CBS e Crédito Apurado</td>
+                            <td>Base de Créditos CBS (Deduzido ICMS Compras)</td>
                             <td id="baseCBSCredito">Compras/Desp: R$ 0,00</td>
                             <td id="valCBSCredito">Crédito: R$ 0,00</td>
                         </tr>
@@ -306,8 +361,20 @@
     </div>
 
     <footer>
-        <p>PPSE Consultoria Contábil | Diagnóstico Fiscal de Alta Precisão Desenvolvido por Célio Gomes </p>
+        <p>PPSE Consultoria Contábil | Diagnóstico Fiscal de Alta Precisão Desenvolvido por Célio Gomes</p>
     </footer>
+</div>
+
+<!-- CONTADOR FLUTUANTE (CANTO INFERIOR DIREITO) -->
+<div class="floating-counter no-print">
+    <div class="floating-counter-icon">
+        <i class="fa-solid fa-chart-line"></i>
+    </div>
+    <div class="floating-counter-info">
+        <span class="floating-counter-title">Análises Realizadas</span>
+        <span id="contadorFlutuante" class="floating-counter-value">+0</span>
+        <span class="floating-counter-sub">Simulações acumuladas</span>
+    </div>
 </div>
 
 <script>
@@ -371,7 +438,7 @@
             badge.className = "status-badge badge-anexo3";
         }
 
-        // Simples Nacional Puro
+        // 1. SIMPLES NACIONAL PURO
         const faixaIdx = obterFaixa(rbt12);
         const dadosAnexo = TABELAS_SIMPLES[anexoEfetivo];
         const nom = dadosAnexo.nominal[faixaIdx];
@@ -382,23 +449,33 @@
 
         const impostoSimplesPuro = fatTotalMes * aliqEfetivaSimples;
 
-        // Simples Híbrido
+        // 2. SIMPLES HÍBRIDO (DAS com redução da parcela federal)
         const parteRetiradaPct = dadosAnexo.cbsHibrido;
         const aliqSimplesHibrido = aliqEfetivaSimples * (1 - parteRetiradaPct);
         const dasSimplesHibrido = fatTotalMes * aliqSimplesHibrido;
 
-        // MEMÓRIA EXATA DA CBS (REDUÇÃO APLICADA APENAS SOBRE A CBS)
-        const baseDebitoCBS = fatTotalMes;
-        const valDebitoCBS = fatTotalMes * aliqCBSInput * (1 - pReducaoCBS);
+        // ==========================================
+        // APURAÇÃO CBS COM EXCLUSÃO DO ISS E ICMS DA BASE
+        // ==========================================
+        const valorISS = fatServ * aliqISSInput;
+        const valorICMSDebito = fatVend * aliqIcmsSaida;
         
-        const baseCreditoCBS = comprasNF + despesasCBS;
-        const valCreditoCBS = (comprasNF * aliqCBSInput) + (despesasCBS * aliqCBSInput);
+        // Base Líquida para Débito de CBS (sem ISS e sem ICMS)
+        const baseDebitoServicos = Math.max(0, fatServ - valorISS);
+        const baseDebitoVendas = Math.max(0, fatVend - valorICMSDebito);
+        const baseDebitoCBS = baseDebitoServicos + baseDebitoVendas;
+        
+        const valDebitoCBS = baseDebitoCBS * aliqCBSInput * (1 - pReducaoCBS);
+        
+        // Base de Crédito CBS (Deduzindo ICMS da compra)
+        const baseComprasComCredito = comprasNF * (1 - aliqIcmsEntrada);
+        const baseCreditoCBS = baseComprasComCredito + despesasCBS;
+        const valCreditoCBS = baseCreditoCBS * aliqCBSInput;
         
         const cbsLiquido = Math.max(0, valDebitoCBS - valCreditoCBS);
-
         const totalSimplesHibrido = dasSimplesHibrido + cbsLiquido;
 
-        // LUCRO PRESUMIDO (IRPJ E CSLL CALCULADOS INTEGRALMENTE SEM REDUÇÃO)
+        // 3. LUCRO PRESUMIDO
         const baseCalculoServ = fatServ * 0.32;
         const baseCalculoVend = fatVend * 0.08;
         const baseIRPJCSLL = baseCalculoServ + baseCalculoVend;
@@ -409,16 +486,15 @@
 
         const totalCSLL = baseIRPJCSLL * 0.09;
 
-        // ICMS e ISS calculados normalmente sobre suas bases
         const icmsDebito = fatVend * aliqIcmsSaida;
         const icmsCredito = comprasNF * aliqIcmsEntrada;
         const icmsLiquido = Math.max(0, icmsDebito - icmsCredito);
 
-        const totalISS = fatServ * aliqISSInput;
+        const totalISS = valorISS;
 
         const totalLucroPresumido = totalIRPJ + totalCSLL + cbsLiquido + icmsLiquido + totalISS;
 
-        // EXIBIÇÃO QUADROS
+        // EXIBIÇÃO QUADROS RESUMO
         document.getElementById('simplesPuroVal').innerText = "R$ " + impostoSimplesPuro.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('simplesPuroPct').innerText = (aliqEfetivaSimples * 100).toFixed(2) + "%";
         document.getElementById('margemSimplesPuro').innerText = (((fatTotalMes - impostoSimplesPuro) / fatTotalMes) * 100).toFixed(2) + "%";
@@ -446,14 +522,14 @@
         else if (menorImposto === totalSimplesHibrido) rowHibrido.className = 'row-winner';
         else rowLP.className = 'row-winner';
 
-        // MEMÓRIA EXIBIÇÃO
+        // MEMÓRIA DE CÁLCULO EXIBIÇÃO
         document.getElementById('memoRBT12').innerText = "RBT12: R$ " + rbt12.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('memoFaixa').innerText = (faixaIdx + 1) + "ª Faixa (Anexo " + anexoEfetivo + ")";
         document.getElementById('memoNominal').innerText = "Nominal: " + (nom * 100).toFixed(2) + "%";
         document.getElementById('memoDeducao').innerText = "Dedução: R$ " + ded.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('memoAliqEfetiva').innerText = (aliqEfetivaSimples * 100).toFixed(2) + "%";
 
-        document.getElementById('baseCBSDebito').innerText = "Base Débito: R$ " + baseDebitoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('baseCBSDebito').innerText = "Líquida s/ ISS/ICMS: R$ " + baseDebitoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valCBSDebito').innerText = "Débito: R$ " + valDebitoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('baseCBSCredito').innerText = "Base Crédito: R$ " + baseCreditoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valCBSCredito').innerText = "Crédito: R$ " + valCreditoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -473,7 +549,28 @@
         document.getElementById('valTotalLP').innerText = "R$ " + totalLucroPresumido.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
-    calcular();
+    // Animação do Contador Flutuante (Canto Inferior Direito)
+    function animarContadorFlutuante() {
+        const el = document.getElementById('contadorFlutuante');
+        const alvo = 1420;
+        let atual = 0;
+        const incremento = Math.ceil(alvo / 40);
+
+        const timer = setInterval(() => {
+            atual += incremento;
+            if (atual >= alvo) {
+                el.innerText = '+' + alvo.toLocaleString('pt-BR');
+                clearInterval(timer);
+            } else {
+                el.innerText = '+' + atual.toLocaleString('pt-BR');
+            }
+        }, 30);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        calcular();
+        animarContadorFlutuante();
+    });
 </script>
 
 </body>
