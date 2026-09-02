@@ -33,7 +33,7 @@
         .header-title h1 { font-size: 1.5rem; color: var(--ppse-dark-gray); font-weight: 700; }
         .header-title p { color: var(--ppse-medium-gray); font-size: 0.88rem; }
 
-        .layout-grid { display: grid; grid-template-columns: 360px 1fr; gap: 18px; }
+        .layout-grid { display: grid; grid-template-columns: 380px 1fr; gap: 18px; }
         @media (max-width: 900px) { .layout-grid { grid-template-columns: 1fr; } }
 
         .card {
@@ -46,11 +46,43 @@
             border-bottom: 2px solid var(--ppse-orange); padding-bottom: 5px; font-weight: 700;
         }
 
+        .cnpj-search-box {
+            background: #FFFDFD;
+            border: 1px solid #FED7D7;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+        }
+        .cnpj-row { display: flex; gap: 6px; margin-top: 4px; }
+        .cnpj-input { flex: 1; font-weight: bold; letter-spacing: 0.5px; }
+        .btn-search {
+            background: var(--ppse-orange);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+        .btn-search:hover { background: var(--ppse-orange-hover); }
+        .cnpj-info {
+            margin-top: 8px;
+            font-size: 0.76rem;
+            color: var(--ppse-medium-gray);
+            line-height: 1.3;
+            display: none;
+        }
+        .cnpj-info strong { color: var(--ppse-dark-gray); }
+
         .form-group { margin-bottom: 10px; }
         .form-row { display: flex; gap: 8px; }
         .form-row .form-group { flex: 1; }
 
         label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 3px; color: var(--ppse-dark-gray); }
+        .label-optional { font-size: 0.72rem; color: var(--ppse-medium-gray); font-weight: normal; }
+        
         input, select {
             width: 100%; padding: 7px 10px; border: 1px solid var(--border-color);
             border-radius: 5px; font-size: 0.85rem; background: #fff; color: var(--text-dark);
@@ -101,12 +133,9 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            font-family: inherit;
             transition: transform 0.2s ease;
         }
-        .floating-counter:hover {
-            transform: scale(1.04);
-        }
+        .floating-counter:hover { transform: scale(1.04); }
         .floating-counter-icon {
             background: rgba(218, 62, 27, 0.2);
             color: var(--ppse-orange);
@@ -118,27 +147,10 @@
             justify-content: center;
             font-size: 1.1rem;
         }
-        .floating-counter-info {
-            display: flex;
-            flex-direction: column;
-        }
-        .floating-counter-title {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #d1d5db;
-            font-weight: 600;
-        }
-        .floating-counter-value {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #ffffff;
-            line-height: 1.1;
-        }
-        .floating-counter-sub {
-            font-size: 0.65rem;
-            color: #9ca3af;
-        }
+        .floating-counter-info { display: flex; flex-direction: column; }
+        .floating-counter-title { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; color: #d1d5db; font-weight: 600; }
+        .floating-counter-value { font-size: 1.15rem; font-weight: 800; color: #ffffff; line-height: 1.1; }
+        .floating-counter-sub { font-size: 0.65rem; color: #9ca3af; }
 
         @media print {
             @page { size: A4 portrait; margin: 6mm; }
@@ -149,7 +161,7 @@
             .header-title h1 { font-size: 1.1rem !important; }
             .layout-grid { display: grid !important; grid-template-columns: 280px 1fr !important; gap: 8px !important; }
             .card { padding: 8px !important; margin-bottom: 6px !important; box-shadow: none !important; border: 1px solid #ccc !important; }
-            .btn-calc, .btn-print, footer, .floating-counter, .no-print { display: none !important; }
+            .btn-calc, .btn-print, footer, .floating-counter, .no-print, .cnpj-search-box { display: none !important; }
             .fator-r-box { padding: 5px 8px !important; margin-bottom: 6px !important; }
             th, td { padding: 4px 6px !important; font-size: 8.5px !important; }
         }
@@ -169,10 +181,28 @@
     </header>
 
     <div class="layout-grid">
-        <!-- FORMULÁRIO -->
         <div class="card">
             <h2>Parâmetros do Cliente</h2>
             
+            <div class="cnpj-search-box no-print">
+                <label><i class="fa-solid fa-magnifying-glass" style="color: var(--ppse-orange);"></i> Importar Dados via CNPJ (Opcional)</label>
+                <div class="cnpj-row">
+                    <input type="text" id="cnpjInput" class="cnpj-input" placeholder="00.000.000/0000-00" maxlength="18">
+                    <button type="button" class="btn-search" id="btnBuscarCnpj" onclick="consultarCNPJ()">Buscar</button>
+                </div>
+                <div id="cnpjInfo" class="cnpj-info">
+                    <span id="razaoSocialTxt"></span><br>
+                    <span id="cnaePrincipalTxt"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>CNAE / Atividade Identificada</label>
+                <select id="cnaeSelect" onchange="alterarCNAESelecionado()">
+                    <option value="manual">-- Preenchimento Manual / Personalizado --</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label>Anexo Base (Simples Nacional)</label>
                 <select id="anexoSelect" onchange="calcular()">
@@ -217,8 +247,8 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Alíquota ISS (%)</label>
-                    <input type="number" id="aliqISS" value="5" step="0.1" oninput="calcular()">
+                    <label>Alíquota Média ISS (%) <span class="label-optional">(Opcional)</span></label>
+                    <input type="number" id="aliqISS" value="5" step="0.1" placeholder="0.0" oninput="calcular()">
                 </div>
                 <div class="form-group">
                     <label>Redução Exclusiva CBS (%)</label>
@@ -228,12 +258,12 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>ICMS Saída (%)</label>
-                    <input type="number" id="aliqIcmsSaida" value="18" step="0.1" oninput="calcular()">
+                    <label>ICMS Médio Saída (%) <span class="label-optional">(Opcional)</span></label>
+                    <input type="number" id="aliqIcmsSaida" value="18" step="0.1" placeholder="0.0" oninput="calcular()">
                 </div>
                 <div class="form-group">
-                    <label>ICMS Entrada (%)</label>
-                    <input type="number" id="aliqIcmsEntrada" value="18" step="0.1" oninput="calcular()">
+                    <label>ICMS Médio Entrada (%) <span class="label-optional">(Opcional)</span></label>
+                    <input type="number" id="aliqIcmsEntrada" value="18" step="0.1" placeholder="0.0" oninput="calcular()">
                 </div>
             </div>
 
@@ -246,7 +276,6 @@
             <button class="btn-print" onclick="window.print()">Imprimir Demonstrativo</button>
         </div>
 
-        <!-- QUADROS DE RESULTADO -->
         <div>
             <div class="card">
                 <h2>Status do Fator R (LC 123/06)</h2>
@@ -331,12 +360,12 @@
                         </tr>
                         <tr class="text-black">
                             <td>IRPJ Lucro Presumido (15% + Adicional 10%)</td>
-                            <td id="baseIRPJ">Base Integral: R$ 0,00</td>
+                            <td id="baseIRPJ">Base Presumida: R$ 0,00</td>
                             <td id="valIRPJ">R$ 0,00</td>
                         </tr>
                         <tr class="text-black">
                             <td>CSLL Lucro Presumido (9%)</td>
-                            <td id="baseCSLL">Base Integral: R$ 0,00</td>
+                            <td id="baseCSLL">Base Presumida: R$ 0,00</td>
                             <td id="valCSLL">R$ 0,00</td>
                         </tr>
                         <tr class="text-black">
@@ -365,7 +394,6 @@
     </footer>
 </div>
 
-<!-- CONTADOR FLUTUANTE (CANTO INFERIOR DIREITO) -->
 <div class="floating-counter no-print">
     <div class="floating-counter-icon">
         <i class="fa-solid fa-chart-line"></i>
@@ -385,6 +413,176 @@
         'IV':  { nominal: [0.045, 0.09, 0.102, 0.14, 0.22, 0.33],   deducao: [0, 8100, 12420, 39780, 183780, 828000], cbsHibrido: 0.2126 },
         'V':   { nominal: [0.155, 0.18, 0.195, 0.205, 0.23, 0.305], deducao: [0, 4500, 9900, 17100, 62100, 540000], cbsHibrido: 0.1696 }
     };
+
+    let parametrosCNAEAtual = {
+        presuncaoIRPJServ: 0.32,
+        presuncaoCSLLServ: 0.32,
+        presuncaoIRPJVend: 0.08,
+        presuncaoCSLLVend: 0.12
+    };
+
+    function mapearRegrasPorCNAE(codigo) {
+        if (!codigo) {
+            return {
+                anexo: 'III',
+                presuncaoIRPJServ: 0.32,
+                presuncaoCSLLServ: 0.32,
+                presuncaoIRPJVend: 0.08,
+                presuncaoCSLLVend: 0.12,
+                reducaoCBS: 0
+            };
+        }
+
+        const clean = codigo.toString().replace(/\D/g, '');
+        const div = parseInt(clean.substring(0, 2), 10);
+
+        if (div >= 45 && div <= 47) {
+            return {
+                anexo: 'I',
+                presuncaoIRPJServ: 0.32,
+                presuncaoCSLLServ: 0.32,
+                presuncaoIRPJVend: 0.08,
+                presuncaoCSLLVend: 0.12,
+                reducaoCBS: 0
+            };
+        }
+
+        if (div >= 10 && div <= 33) {
+            return {
+                anexo: 'II',
+                presuncaoIRPJServ: 0.32,
+                presuncaoCSLLServ: 0.32,
+                presuncaoIRPJVend: 0.08,
+                presuncaoCSLLVend: 0.12,
+                reducaoCBS: 0
+            };
+        }
+
+        if (div === 86) {
+            return {
+                anexo: 'V',
+                presuncaoIRPJServ: 0.08,
+                presuncaoCSLLServ: 0.12,
+                presuncaoIRPJVend: 0.08,
+                presuncaoCSLLVend: 0.12,
+                reducaoCBS: 60
+            };
+        }
+
+        if (div === 85) {
+            return {
+                anexo: 'III',
+                presuncaoIRPJServ: 0.32,
+                presuncaoCSLLServ: 0.32,
+                presuncaoIRPJVend: 0.08,
+                presuncaoCSLLVend: 0.12,
+                reducaoCBS: 60
+            };
+        }
+
+        if (div === 69 || div === 41 || div === 42 || div === 43 || div === 80) {
+            return {
+                anexo: 'IV',
+                presuncaoIRPJServ: 0.32,
+                presuncaoCSLLServ: 0.32,
+                presuncaoIRPJVend: 0.08,
+                presuncaoCSLLVend: 0.12,
+                reducaoCBS: (div === 69 ? 30 : 0)
+            };
+        }
+
+        return {
+            anexo: 'V',
+            presuncaoIRPJServ: 0.32,
+            presuncaoCSLLServ: 0.32,
+            presuncaoIRPJVend: 0.08,
+            presuncaoCSLLVend: 0.12,
+            reducaoCBS: 0
+        };
+    }
+
+    async function consultarCNPJ() {
+        const input = document.getElementById('cnpjInput');
+        const btn = document.getElementById('btnBuscarCnpj');
+        const cnpjClean = input.value.replace(/\D/g, '');
+
+        if (cnpjClean.length !== 14) {
+            alert('Por favor, informe um CNPJ válido com 14 dígitos.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = 'Buscando...';
+
+        try {
+            const resp = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjClean}`);
+            if (!resp.ok) throw new Error('CNPJ não localizado');
+            const data = await resp.json();
+
+            const cnpjInfo = document.getElementById('cnpjInfo');
+            cnpjInfo.style.display = 'block';
+            document.getElementById('razaoSocialTxt').innerHTML = `<strong>Razão:</strong> ${data.razao_social || data.nome_fantasia}`;
+            document.getElementById('cnaePrincipalTxt').innerHTML = `<strong>Atividade:</strong> ${data.cnae_fiscal} - ${data.cnae_fiscal_descricao}`;
+
+            const selectCnae = document.getElementById('cnaeSelect');
+            selectCnae.innerHTML = '';
+
+            const optPrincipal = document.createElement('option');
+            optPrincipal.value = data.cnae_fiscal;
+            optPrincipal.innerText = `Principal: ${data.cnae_fiscal} - ${data.cnae_fiscal_descricao}`;
+            selectCnae.appendChild(optPrincipal);
+
+            if (data.cnaes_secundarios && data.cnaes_secundarios.length > 0) {
+                data.cnaes_secundarios.forEach(sec => {
+                    const opt = document.createElement('option');
+                    opt.value = sec.codigo;
+                    opt.innerText = `Secundário: ${sec.codigo} - ${sec.descricao}`;
+                    selectCnae.appendChild(opt);
+                });
+            }
+
+            aplicarConfiguracoesDoCNAE(data.cnae_fiscal);
+
+        } catch (err) {
+            alert('Não foi possível carregar os dados deste CNPJ. Você pode preencher os campos manualmente.');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Buscar';
+        }
+    }
+
+    function aplicarConfiguracoesDoCNAE(codigoCNAE) {
+        const regras = mapearRegrasPorCNAE(codigoCNAE);
+        
+        document.getElementById('anexoSelect').value = regras.anexo;
+
+        parametrosCNAEAtual.presuncaoIRPJServ = regras.presuncaoIRPJServ;
+        parametrosCNAEAtual.presuncaoCSLLServ = regras.presuncaoCSLLServ;
+        parametrosCNAEAtual.presuncaoIRPJVend = regras.presuncaoIRPJVend;
+        parametrosCNAEAtual.presuncaoCSLLVend = regras.presuncaoCSLLVend;
+
+        document.getElementById('percentualReducao').value = regras.reducaoCBS;
+
+        calcular();
+    }
+
+    function alterarCNAESelecionado() {
+        const selectCnae = document.getElementById('cnaeSelect');
+        const cnae = selectCnae.value;
+        if (cnae && cnae !== 'manual') {
+            aplicarConfiguracoesDoCNAE(cnae);
+        }
+    }
+
+    document.getElementById('cnpjInput').addEventListener('input', function(e) {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length > 14) v = v.substring(0, 14);
+        v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+        v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+        v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+        v = v.replace(/(\d{4})(\d)/, '$1-$2');
+        e.target.value = v;
+    });
 
     function obterFaixa(rbt12) {
         if (rbt12 <= 180000) return 0;
@@ -408,6 +606,7 @@
         const comprasNF = parseFloat(document.getElementById('comprasNF').value) || 0;
         const despesasCBS = parseFloat(document.getElementById('despesasCBS').value) || 0;
 
+        // ALÍQUOTAS LOCAIS OPCIONAIS (Se em branco ou zero, adota 0)
         const aliqISSInput = (parseFloat(document.getElementById('aliqISS').value) || 0) / 100;
         const pReducaoCBS = (parseFloat(document.getElementById('percentualReducao').value) || 0) / 100;
         const aliqIcmsSaida = (parseFloat(document.getElementById('aliqIcmsSaida').value) || 0) / 100;
@@ -454,20 +653,18 @@
         const aliqSimplesHibrido = aliqEfetivaSimples * (1 - parteRetiradaPct);
         const dasSimplesHibrido = fatTotalMes * aliqSimplesHibrido;
 
-        // ==========================================
         // APURAÇÃO CBS COM EXCLUSÃO DO ISS E ICMS DA BASE
-        // ==========================================
         const valorISS = fatServ * aliqISSInput;
         const valorICMSDebito = fatVend * aliqIcmsSaida;
         
-        // Base Líquida para Débito de CBS (sem ISS e sem ICMS)
+        // Se ISS ou ICMS forem informados, deduzem da base; se for 0, usa o faturamento integral
         const baseDebitoServicos = Math.max(0, fatServ - valorISS);
         const baseDebitoVendas = Math.max(0, fatVend - valorICMSDebito);
         const baseDebitoCBS = baseDebitoServicos + baseDebitoVendas;
         
         const valDebitoCBS = baseDebitoCBS * aliqCBSInput * (1 - pReducaoCBS);
         
-        // Base de Crédito CBS (Deduzindo ICMS da compra)
+        // Crédito CBS (deduzindo a alíquota média de entrada de ICMS informada)
         const baseComprasComCredito = comprasNF * (1 - aliqIcmsEntrada);
         const baseCreditoCBS = baseComprasComCredito + despesasCBS;
         const valCreditoCBS = baseCreditoCBS * aliqCBSInput;
@@ -476,16 +673,16 @@
         const totalSimplesHibrido = dasSimplesHibrido + cbsLiquido;
 
         // 3. LUCRO PRESUMIDO
-        const baseCalculoServ = fatServ * 0.32;
-        const baseCalculoVend = fatVend * 0.08;
-        const baseIRPJCSLL = baseCalculoServ + baseCalculoVend;
+        const baseIRPJ = (fatServ * parametrosCNAEAtual.presuncaoIRPJServ) + (fatVend * parametrosCNAEAtual.presuncaoIRPJVend);
+        const baseCSLL = (fatServ * parametrosCNAEAtual.presuncaoCSLLServ) + (fatVend * parametrosCNAEAtual.presuncaoCSLLVend);
 
-        const irpj15 = baseIRPJCSLL * 0.15;
-        const irpjAdicional = Math.max(0, (baseIRPJCSLL - 20000) * 0.10);
+        const irpj15 = baseIRPJ * 0.15;
+        const irpjAdicional = Math.max(0, (baseIRPJ - 20000) * 0.10);
         const totalIRPJ = irpj15 + irpjAdicional;
 
-        const totalCSLL = baseIRPJCSLL * 0.09;
+        const totalCSLL = baseCSLL * 0.09;
 
+        // ICMS e ISS com base nas médias informadas pelo usuário
         const icmsDebito = fatVend * aliqIcmsSaida;
         const icmsCredito = comprasNF * aliqIcmsEntrada;
         const icmsLiquido = Math.max(0, icmsDebito - icmsCredito);
@@ -535,9 +732,9 @@
         document.getElementById('valCBSCredito').innerText = "Crédito: R$ " + valCreditoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valCBSLiquido').innerText = "R$ " + cbsLiquido.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-        document.getElementById('baseIRPJ').innerText = "Base Integral: R$ " + baseIRPJCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('baseIRPJ').innerText = "Base Presumida: R$ " + baseIRPJ.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valIRPJ').innerText = "R$ " + totalIRPJ.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('baseCSLL').innerText = "Base Integral: R$ " + baseIRPJCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('baseCSLL').innerText = "Base Presumida: R$ " + baseCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valCSLL').innerText = "R$ " + totalCSLL.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
         document.getElementById('baseICMS').innerText = "Vendas: R$ " + fatVend.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -549,7 +746,6 @@
         document.getElementById('valTotalLP').innerText = "R$ " + totalLucroPresumido.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
-    // Animação do Contador Flutuante (Canto Inferior Direito)
     function animarContadorFlutuante() {
         const el = document.getElementById('contadorFlutuante');
         const alvo = 1420;
