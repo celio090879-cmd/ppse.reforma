@@ -450,10 +450,10 @@
 </div>
 
 <script>
-    // ==========================================
-    // CONFIGURAÇÃO DO WHATSAPP (Substitua pelo seu número)
-    // ==========================================
-    const WHATSAPP_NUMERO = "5511969965188"; // Formato: 55 + DDD + Número
+    // ========================================================
+    // NÚMERO DE WHATSAPP OFICIAL PPSE
+    // ========================================================
+    const WHATSAPP_NUMERO = "5511996695188";
 
     const TABELAS_SIMPLES = {
         'I':   { nominal: [0.04, 0.073, 0.095, 0.107, 0.143, 0.19], deducao: [0, 5940, 13860, 22500, 87300, 378000], cbsHibrido: 0.155 },
@@ -470,7 +470,7 @@
         presuncaoCSLLVend: 0.12
     };
 
-    // Mapeamento fiscal com tratamento especial para Contabilidade (Anexo III)
+    // Mapeamento minucioso considerando subclasses específicas
     function mapearRegrasPorCNAE(codigo) {
         if (!codigo) {
             return {
@@ -484,10 +484,11 @@
         }
 
         const clean = codigo.toString().replace(/\D/g, '');
+        const prefixo4 = clean.substring(0, 4);
         const div = parseInt(clean.substring(0, 2), 10);
 
-        // 1. ATIVIDADES CONTÁBEIS (CNAE 6920) -> Expressamente ANEXO III
-        if (clean.startsWith('6920')) {
+        // 1. Contabilidade e Auditoria (CNAE 6920) -> ANEXO III
+        if (prefixo4 === '6920') {
             return {
                 anexo: 'III',
                 presuncaoIRPJServ: 0.32,
@@ -498,8 +499,20 @@
             };
         }
 
-        // 2. SERVIÇOS ADVOCATÍCIOS (CNAE 6911) -> ANEXO IV
-        if (clean.startsWith('6911')) {
+        // 2. Promoção de Vendas (CNAE 7319) -> ANEXO III
+        if (prefixo4 === '7319') {
+            return {
+                anexo: 'III',
+                presuncaoIRPJServ: 0.32,
+                presuncaoCSLLServ: 0.32,
+                presuncaoIRPJVend: 0.08,
+                presuncaoCSLLVend: 0.12,
+                reducaoCBS: 0
+            };
+        }
+
+        // 3. Advocacia (CNAE 6911) -> ANEXO IV
+        if (prefixo4 === '6911') {
             return {
                 anexo: 'IV',
                 presuncaoIRPJServ: 0.32,
@@ -510,7 +523,7 @@
             };
         }
 
-        // 3. Comércio (Divisões 45 a 47) -> ANEXO I
+        // 4. Comércio (Divisões 45 a 47) -> ANEXO I
         if (div >= 45 && div <= 47) {
             return {
                 anexo: 'I',
@@ -522,7 +535,7 @@
             };
         }
 
-        // 4. Indústria (Divisões 10 a 33) -> ANEXO II
+        // 5. Indústria (Divisões 10 a 33) -> ANEXO II
         if (div >= 10 && div <= 33) {
             return {
                 anexo: 'II',
@@ -534,7 +547,7 @@
             };
         }
 
-        // 5. Construção Civil, Vigilância e Limpeza -> ANEXO IV
+        // 6. Construção Civil, Vigilância e Limpeza -> ANEXO IV
         if (div === 41 || div === 42 || div === 43 || div === 80 || div === 81) {
             return {
                 anexo: 'IV',
@@ -546,7 +559,7 @@
             };
         }
 
-        // 6. Saúde e Medicina (Divisão 86) -> ANEXO V (com Fator R para Anexo III)
+        // 7. Saúde e Medicina (Divisão 86) -> ANEXO V (Fator R)
         if (div === 86) {
             return {
                 anexo: 'V',
@@ -558,7 +571,7 @@
             };
         }
 
-        // 7. Ensino / Educação (Divisão 85) -> ANEXO III
+        // 8. Ensino / Educação (Divisão 85) -> ANEXO III
         if (div === 85) {
             return {
                 anexo: 'III',
@@ -570,7 +583,7 @@
             };
         }
 
-        // 8. TI, Engenharia, Arquitetura, Consultoria -> ANEXO V (Fator R)
+        // 9. TI, Engenharia, Arquitetura, Consultoria -> ANEXO V (Fator R)
         if ((div >= 62 && div <= 63) || div === 71 || div === 70 || div === 73) {
             return {
                 anexo: 'V',
@@ -805,7 +818,6 @@
         const melhorRegime = impostos[0];
         const segundoMelhor = impostos[1];
         
-        // Economia Anual em relação à segunda melhor alternativa
         const economiaMensal = Math.max(0, segundoMelhor.val - melhorRegime.val);
         const economiaAnual = economiaMensal * 12;
 
@@ -826,7 +838,7 @@
         else rowLP.className = 'row-winner';
 
         // ==========================================
-        // 2. MENSAGEM DINÂMICA DO WHATSAPP
+        // 2. MENSAGEM DINÂMICA DO WHATSAPP (5511996695188)
         // ==========================================
         const cnpjVal = document.getElementById('cnpjInput').value || 'Não informado';
         const msgWhats = encodeURIComponent(
