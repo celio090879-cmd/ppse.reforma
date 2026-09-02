@@ -235,7 +235,7 @@
                 <select id="anexoSelect" onchange="calcular()">
                     <option value="I">Anexo I - Comércio</option>
                     <option value="II">Anexo II - Indústria</option>
-                    <option value="III" selected>Anexo III - Serviços (inclusive Contabilidade)</option>
+                    <option value="III" selected>Anexo III - Serviços (inclusive Contabilidade e Promoção de Vendas)</option>
                     <option value="IV">Anexo IV - Advocacia, Construção & Vigilância</option>
                     <option value="V">Anexo V - Serviços Intelectuais (sujeito ao Fator R)</option>
                 </select>
@@ -279,7 +279,7 @@
                     <input type="number" id="aliqISS" value="5" step="0.1" placeholder="0.0" oninput="calcular()">
                 </div>
                 <div class="form-group">
-                    <label>Redução Exclusiva CBS (%)</label>
+                    <label>Redução Exclusiva CBS (%) <span class="label-optional">(Via CNAE)</span></label>
                     <input type="number" id="percentualReducao" value="0" step="1" oninput="calcular()">
                 </div>
             </div>
@@ -470,7 +470,7 @@
         presuncaoCSLLVend: 0.12
     };
 
-    // Mapeamento minucioso considerando subclasses específicas
+    // Mapeamento minucioso considerando subclasses específicas e redutores da Reforma Tributária (CBS/IBS)
     function mapearRegrasPorCNAE(codigo) {
         if (!codigo) {
             return {
@@ -487,7 +487,7 @@
         const prefixo4 = clean.substring(0, 4);
         const div = parseInt(clean.substring(0, 2), 10);
 
-        // 1. Contabilidade e Auditoria (CNAE 6920) -> ANEXO III
+        // 1. Contabilidade e Auditoria (CNAE 6920) -> ANEXO III | Redução CBS/IBS 30% (Profissão Regulamentada)
         if (prefixo4 === '6920') {
             return {
                 anexo: 'III',
@@ -495,11 +495,11 @@
                 presuncaoCSLLServ: 0.32,
                 presuncaoIRPJVend: 0.08,
                 presuncaoCSLLVend: 0.12,
-                reducaoCBS: 0
+                reducaoCBS: 30
             };
         }
 
-        // 2. Promoção de Vendas (CNAE 7319) -> ANEXO III
+        // 2. Promoção de Vendas (CNAE 7319) -> ANEXO III | Redução CBS/IBS 0%
         if (prefixo4 === '7319') {
             return {
                 anexo: 'III',
@@ -511,7 +511,7 @@
             };
         }
 
-        // 3. Advocacia (CNAE 6911) -> ANEXO IV
+        // 3. Advocacia (CNAE 6911) -> ANEXO IV | Redução CBS/IBS 30% (Profissão Regulamentada)
         if (prefixo4 === '6911') {
             return {
                 anexo: 'IV',
@@ -523,47 +523,23 @@
             };
         }
 
-        // 4. Comércio (Divisões 45 a 47) -> ANEXO I
-        if (div >= 45 && div <= 47) {
+        // 4. Engenharia e Arquitetura (Divisão 71) -> ANEXO V (Fator R) | Redução CBS/IBS 30% (Profissão Regulamentada)
+        if (div === 71) {
             return {
-                anexo: 'I',
+                anexo: 'V',
                 presuncaoIRPJServ: 0.32,
                 presuncaoCSLLServ: 0.32,
                 presuncaoIRPJVend: 0.08,
                 presuncaoCSLLVend: 0.12,
-                reducaoCBS: 0
+                reducaoCBS: 30
             };
         }
 
-        // 5. Indústria (Divisões 10 a 33) -> ANEXO II
-        if (div >= 10 && div <= 33) {
-            return {
-                anexo: 'II',
-                presuncaoIRPJServ: 0.32,
-                presuncaoCSLLServ: 0.32,
-                presuncaoIRPJVend: 0.08,
-                presuncaoCSLLVend: 0.12,
-                reducaoCBS: 0
-            };
-        }
-
-        // 6. Construção Civil, Vigilância e Limpeza -> ANEXO IV
-        if (div === 41 || div === 42 || div === 43 || div === 80 || div === 81) {
-            return {
-                anexo: 'IV',
-                presuncaoIRPJServ: 0.32,
-                presuncaoCSLLServ: 0.32,
-                presuncaoIRPJVend: 0.08,
-                presuncaoCSLLVend: 0.12,
-                reducaoCBS: 0
-            };
-        }
-
-        // 7. Saúde e Medicina (Divisão 86) -> ANEXO V (Fator R)
+        // 5. Saúde Humana (Psicologia 8650, Medicina, Odontologia, Fisioterapia - Divisão 86) -> ANEXO V (Fator R) | Redução CBS/IBS 60%
         if (div === 86) {
             return {
                 anexo: 'V',
-                presuncaoIRPJServ: 0.08,
+                presuncaoIRPJServ: 0.08, // Presunção equiparada a serviços de saúde/hospitalar
                 presuncaoCSLLServ: 0.12,
                 presuncaoIRPJVend: 0.08,
                 presuncaoCSLLVend: 0.12,
@@ -571,7 +547,7 @@
             };
         }
 
-        // 8. Ensino / Educação (Divisão 85) -> ANEXO III
+        // 6. Ensino e Educação (Divisão 85) -> ANEXO III | Redução CBS/IBS 60%
         if (div === 85) {
             return {
                 anexo: 'III',
@@ -583,8 +559,44 @@
             };
         }
 
-        // 9. TI, Engenharia, Arquitetura, Consultoria -> ANEXO V (Fator R)
-        if ((div >= 62 && div <= 63) || div === 71 || div === 70 || div === 73) {
+        // 7. Comércio (Divisões 45 a 47) -> ANEXO I | Redução CBS/IBS 0%
+        if (div >= 45 && div <= 47) {
+            return {
+                anexo: 'I',
+                presuncaoIRPJServ: 0.32,
+                presuncaoCSLLServ: 0.32,
+                presuncaoIRPJVend: 0.08,
+                presuncaoCSLLVend: 0.12,
+                reducaoCBS: 0
+            };
+        }
+
+        // 8. Indústria (Divisões 10 a 33) -> ANEXO II | Redução CBS/IBS 0%
+        if (div >= 10 && div <= 33) {
+            return {
+                anexo: 'II',
+                presuncaoIRPJServ: 0.32,
+                presuncaoCSLLServ: 0.32,
+                presuncaoIRPJVend: 0.08,
+                presuncaoCSLLVend: 0.12,
+                reducaoCBS: 0
+            };
+        }
+
+        // 9. Construção Civil, Vigilância e Limpeza -> ANEXO IV | Redução CBS/IBS 0%
+        if (div === 41 || div === 42 || div === 43 || div === 80 || div === 81) {
+            return {
+                anexo: 'IV',
+                presuncaoIRPJServ: 0.32,
+                presuncaoCSLLServ: 0.32,
+                presuncaoIRPJVend: 0.08,
+                presuncaoCSLLVend: 0.12,
+                reducaoCBS: 0
+            };
+        }
+
+        // 10. TI, Desenvolvimento de Software e Consultoria Geral -> ANEXO V (Fator R) | Redução CBS/IBS 0%
+        if ((div >= 62 && div <= 63) || div === 70 || div === 73) {
             return {
                 anexo: 'V',
                 presuncaoIRPJServ: 0.32,
@@ -595,7 +607,7 @@
             };
         }
 
-        // Padrão Geral -> Anexo III
+        // Padrão Geral -> Anexo III | Redução CBS/IBS 0%
         return {
             anexo: 'III',
             presuncaoIRPJServ: 0.32,
@@ -659,15 +671,19 @@
     function aplicarConfiguracoesDoCNAE(codigoCNAE) {
         const regras = mapearRegrasPorCNAE(codigoCNAE);
         
+        // 1. Atualiza Anexo do Simples Nacional
         document.getElementById('anexoSelect').value = regras.anexo;
 
+        // 2. Atualiza Parâmetros de Presunção do Lucro Presumido
         parametrosCNAEAtual.presuncaoIRPJServ = regras.presuncaoIRPJServ;
         parametrosCNAEAtual.presuncaoCSLLServ = regras.presuncaoCSLLServ;
         parametrosCNAEAtual.presuncaoIRPJVend = regras.presuncaoIRPJVend;
         parametrosCNAEAtual.presuncaoCSLLVend = regras.presuncaoCSLLVend;
 
+        // 3. Atualiza Automaticamente o Redutor da CBS/IBS conforme o CNAE
         document.getElementById('percentualReducao').value = regras.reducaoCBS;
 
+        // Recalcular toda a tabela e demonstrativos
         calcular();
     }
 
@@ -757,7 +773,7 @@
         const aliqSimplesHibrido = aliqEfetivaSimples * (1 - parteRetiradaPct);
         const dasSimplesHibrido = fatTotalMes * aliqSimplesHibrido;
 
-        // APURAÇÃO CBS COM DEDUÇÃO DO ISS E ICMS
+        // APURAÇÃO CBS COM DEDUÇÃO DO ISS E ICMS DA BASE E APLICAÇÃO DA REDUÇÃO POR CNAE
         const valorISS = fatServ * aliqISSInput;
         const valorICMSDebito = fatVend * aliqIcmsSaida;
         
@@ -765,6 +781,7 @@
         const baseDebitoVendas = Math.max(0, fatVend - valorICMSDebito);
         const baseDebitoCBS = baseDebitoServicos + baseDebitoVendas;
         
+        // Aplicação do redutor (ex: 30% contabilidade/engenharia, 60% saúde/educação)
         const valDebitoCBS = baseDebitoCBS * aliqCBSInput * (1 - pReducaoCBS);
         
         const baseComprasComCredito = comprasNF * (1 - aliqIcmsEntrada);
@@ -806,7 +823,7 @@
         document.getElementById('margemLucroPresumido').innerText = (((fatTotalMes - totalLucroPresumido) / fatTotalMes) * 100).toFixed(2) + "%";
 
         // ==========================================
-        // 1. ANUALIZAÇÃO DA ECONOMIA NO MELHOR REGIME
+        // ANUALIZAÇÃO DA ECONOMIA NO MELHOR REGIME
         // ==========================================
         const impostos = [
             { nome: 'Simples Nacional Puro', val: impostoSimplesPuro },
@@ -838,7 +855,7 @@
         else rowLP.className = 'row-winner';
 
         // ==========================================
-        // 2. MENSAGEM DINÂMICA DO WHATSAPP (5511996695188)
+        // MENSAGEM DINÂMICA DO WHATSAPP (5511996695188)
         // ==========================================
         const cnpjVal = document.getElementById('cnpjInput').value || 'Não informado';
         const msgWhats = encodeURIComponent(
