@@ -226,7 +226,14 @@
             <div class="form-group">
                 <label>CNAE / Atividade Identificada</label>
                 <select id="cnaeSelect" onchange="alterarCNAESelecionado()">
-                    <option value="manual">-- Preenchimento Manual / Personalizado --</option>
+                    <option value="6920601" selected>6920-6/01 - Atividades de Contabilidade (Redução 30%)</option>
+                    <option value="8650003">8650-0/03 - Atividades de Psicologia e Psicanálise (Redução 60%)</option>
+                    <option value="8630503">8630-5/03 - Atividade Médica Ambulatorial (Redução 60%)</option>
+                    <option value="6911701">6911-7/01 - Serviços Advocatícios (Redução 30%)</option>
+                    <option value="7112000">7112-0/00 - Serviços de Engenharia (Redução 30%)</option>
+                    <option value="7319002">7319-0/02 - Promoção de Vendas (Redução 0%)</option>
+                    <option value="4711301">4711-3/01 - Comércio Varejista em Geral (Redução 0%)</option>
+                    <option value="manual">-- Outro CNAE / Preenchimento Manual --</option>
                 </select>
             </div>
 
@@ -272,15 +279,14 @@
                 <input type="number" id="despesasCBS" value="2250" oninput="calcular()">
             </div>
 
-            <!-- TRIBUTOS LOCAIS COM ALÍQUOTA MÉDIA / OPCIONAL -->
             <div class="form-row">
                 <div class="form-group">
                     <label>Alíquota Média ISS (%) <span class="label-optional">(Opcional)</span></label>
                     <input type="number" id="aliqISS" value="5" step="0.1" placeholder="0.0" oninput="calcular()">
                 </div>
                 <div class="form-group">
-                    <label>Redução Exclusiva CBS (%) <span class="label-optional">(Via CNAE)</span></label>
-                    <input type="number" id="percentualReducao" value="0" step="1" oninput="calcular()">
+                    <label>Redução CBS/IBS (%) <span class="label-optional" id="labelReducaoInfo">(Via CNAE)</span></label>
+                    <input type="number" id="percentualReducao" value="30" step="1" oninput="calcular()">
                 </div>
             </div>
 
@@ -387,7 +393,7 @@
                             <td id="memoAliqEfetiva">0,00%</td>
                         </tr>
                         <tr class="text-black">
-                            <td>Base de Débito CBS (Excluídos ISS/ICMS e c/ Redução)</td>
+                            <td>Base de Débito CBS (Excluídos ISS/ICMS)</td>
                             <td id="baseCBSDebito">Líquida: R$ 0,00</td>
                             <td id="valCBSDebito">Débito: R$ 0,00</td>
                         </tr>
@@ -450,9 +456,6 @@
 </div>
 
 <script>
-    // ========================================================
-    // NÚMERO DE WHATSAPP OFICIAL PPSE
-    // ========================================================
     const WHATSAPP_NUMERO = "5511996695188";
 
     const TABELAS_SIMPLES = {
@@ -470,9 +473,9 @@
         presuncaoCSLLVend: 0.12
     };
 
-    // Mapeamento minucioso considerando subclasses específicas e redutores da Reforma Tributária (CBS/IBS)
+    // Mapeador com normalização rigorosa de CNAE
     function mapearRegrasPorCNAE(codigo) {
-        if (!codigo) {
+        if (!codigo || codigo === 'manual') {
             return {
                 anexo: 'III',
                 presuncaoIRPJServ: 0.32,
@@ -483,11 +486,16 @@
             };
         }
 
-        const clean = codigo.toString().replace(/\D/g, '');
+        // Limpa e garante 7 dígitos com zero à esquerda (ex: 865003 vira 0865003, ou 6920601)
+        let clean = codigo.toString().replace(/\D/g, '');
+        if (clean.length < 7) {
+            clean = clean.padStart(7, '0');
+        }
+
         const prefixo4 = clean.substring(0, 4);
         const div = parseInt(clean.substring(0, 2), 10);
 
-        // 1. Contabilidade e Auditoria (CNAE 6920) -> ANEXO III | Redução CBS/IBS 30% (Profissão Regulamentada)
+        // 1. Contabilidade e Auditoria (CNAE 6920) -> ANEXO III | Redução CBS 30%
         if (prefixo4 === '6920') {
             return {
                 anexo: 'III',
@@ -499,7 +507,7 @@
             };
         }
 
-        // 2. Promoção de Vendas (CNAE 7319) -> ANEXO III | Redução CBS/IBS 0%
+        // 2. Promoção de Vendas (CNAE 7319) -> ANEXO III | Redução CBS 0%
         if (prefixo4 === '7319') {
             return {
                 anexo: 'III',
@@ -511,7 +519,7 @@
             };
         }
 
-        // 3. Advocacia (CNAE 6911) -> ANEXO IV | Redução CBS/IBS 30% (Profissão Regulamentada)
+        // 3. Advocacia (CNAE 6911) -> ANEXO IV | Redução CBS 30%
         if (prefixo4 === '6911') {
             return {
                 anexo: 'IV',
@@ -523,7 +531,7 @@
             };
         }
 
-        // 4. Engenharia e Arquitetura (Divisão 71) -> ANEXO V (Fator R) | Redução CBS/IBS 30% (Profissão Regulamentada)
+        // 4. Engenharia e Arquitetura (Divisão 71) -> ANEXO V (Fator R) | Redução CBS 30%
         if (div === 71) {
             return {
                 anexo: 'V',
@@ -535,11 +543,11 @@
             };
         }
 
-        // 5. Saúde Humana (Psicologia 8650, Medicina, Odontologia, Fisioterapia - Divisão 86) -> ANEXO V (Fator R) | Redução CBS/IBS 60%
+        // 5. Saúde Humana (Psicologia 8650, Medicina, Odontologia, Fisioterapia - Divisão 86) -> ANEXO V | Redução CBS 60%
         if (div === 86) {
             return {
                 anexo: 'V',
-                presuncaoIRPJServ: 0.08, // Presunção equiparada a serviços de saúde/hospitalar
+                presuncaoIRPJServ: 0.08,
                 presuncaoCSLLServ: 0.12,
                 presuncaoIRPJVend: 0.08,
                 presuncaoCSLLVend: 0.12,
@@ -547,7 +555,7 @@
             };
         }
 
-        // 6. Ensino e Educação (Divisão 85) -> ANEXO III | Redução CBS/IBS 60%
+        // 6. Ensino e Educação (Divisão 85) -> ANEXO III | Redução CBS 60%
         if (div === 85) {
             return {
                 anexo: 'III',
@@ -559,7 +567,7 @@
             };
         }
 
-        // 7. Comércio (Divisões 45 a 47) -> ANEXO I | Redução CBS/IBS 0%
+        // 7. Comércio (Divisões 45 a 47) -> ANEXO I | Redução CBS 0%
         if (div >= 45 && div <= 47) {
             return {
                 anexo: 'I',
@@ -571,7 +579,7 @@
             };
         }
 
-        // 8. Indústria (Divisões 10 a 33) -> ANEXO II | Redução CBS/IBS 0%
+        // 8. Indústria (Divisões 10 a 33) -> ANEXO II | Redução CBS 0%
         if (div >= 10 && div <= 33) {
             return {
                 anexo: 'II',
@@ -583,7 +591,7 @@
             };
         }
 
-        // 9. Construção Civil, Vigilância e Limpeza -> ANEXO IV | Redução CBS/IBS 0%
+        // 9. Construção Civil, Vigilância e Limpeza -> ANEXO IV | Redução CBS 0%
         if (div === 41 || div === 42 || div === 43 || div === 80 || div === 81) {
             return {
                 anexo: 'IV',
@@ -595,7 +603,7 @@
             };
         }
 
-        // 10. TI, Desenvolvimento de Software e Consultoria Geral -> ANEXO V (Fator R) | Redução CBS/IBS 0%
+        // 10. TI e Consultoria Geral -> ANEXO V (Fator R) | Redução CBS 0%
         if ((div >= 62 && div <= 63) || div === 70 || div === 73) {
             return {
                 anexo: 'V',
@@ -607,7 +615,7 @@
             };
         }
 
-        // Padrão Geral -> Anexo III | Redução CBS/IBS 0%
+        // Padrão Geral -> Anexo III | Redução CBS 0%
         return {
             anexo: 'III',
             presuncaoIRPJServ: 0.32,
@@ -631,41 +639,65 @@
         btn.disabled = true;
         btn.innerText = 'Buscando...';
 
+        let data = null;
+
+        // Tentativa 1: BrasilAPI
         try {
             const resp = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjClean}`);
-            if (!resp.ok) throw new Error('CNPJ não localizado');
-            const data = await resp.json();
+            if (resp.ok) data = await resp.json();
+        } catch (e) {}
 
-            const cnpjInfo = document.getElementById('cnpjInfo');
-            cnpjInfo.style.display = 'block';
-            document.getElementById('razaoSocialTxt').innerHTML = `<strong>Razão:</strong> ${data.razao_social || data.nome_fantasia}`;
-            document.getElementById('cnaePrincipalTxt').innerHTML = `<strong>Atividade:</strong> ${data.cnae_fiscal} - ${data.cnae_fiscal_descricao}`;
-
-            const selectCnae = document.getElementById('cnaeSelect');
-            selectCnae.innerHTML = '';
-
-            const optPrincipal = document.createElement('option');
-            optPrincipal.value = data.cnae_fiscal;
-            optPrincipal.innerText = `Principal: ${data.cnae_fiscal} - ${data.cnae_fiscal_descricao}`;
-            selectCnae.appendChild(optPrincipal);
-
-            if (data.cnaes_secundarios && data.cnaes_secundarios.length > 0) {
-                data.cnaes_secundarios.forEach(sec => {
-                    const opt = document.createElement('option');
-                    opt.value = sec.codigo;
-                    opt.innerText = `Secundário: ${sec.codigo} - ${sec.descricao}`;
-                    selectCnae.appendChild(opt);
-                });
-            }
-
-            aplicarConfiguracoesDoCNAE(data.cnae_fiscal);
-
-        } catch (err) {
-            alert('Não foi possível carregar os dados deste CNPJ. Você pode preencher os campos manualmente.');
-        } finally {
-            btn.disabled = false;
-            btn.innerText = 'Buscar';
+        // Tentativa 2: MinhaReceita (Fallback)
+        if (!data) {
+            try {
+                const resp2 = await fetch(`https://minhareceita.org/${cnpjClean}`);
+                if (resp2.ok) data = await resp2.json();
+            } catch (e) {}
         }
+
+        btn.disabled = false;
+        btn.innerText = 'Buscar';
+
+        if (!data) {
+            alert('Não foi possível localizar o CNPJ nas bases públicas. Você pode selecionar a atividade ou preencher manualmente.');
+            return;
+        }
+
+        // Extrai código do CNAE
+        const codCnae = data.cnae_fiscal || (data.cnae_fiscal_principal && data.cnae_fiscal_principal.codigo) || '';
+        const descCnae = data.cnae_fiscal_descricao || (data.cnae_fiscal_principal && data.cnae_fiscal_principal.descricao) || 'Atividade principal';
+
+        const cnpjInfo = document.getElementById('cnpjInfo');
+        cnpjInfo.style.display = 'block';
+        document.getElementById('razaoSocialTxt').innerHTML = `<strong>Razão:</strong> ${data.razao_social || data.nome_fantasia || 'Identificada'}`;
+        document.getElementById('cnaePrincipalTxt').innerHTML = `<strong>Atividade:</strong> ${codCnae} - ${descCnae}`;
+
+        const selectCnae = document.getElementById('cnaeSelect');
+        selectCnae.innerHTML = '';
+
+        // Adiciona o CNAE Principal retornado
+        const optPrincipal = document.createElement('option');
+        optPrincipal.value = codCnae;
+        optPrincipal.innerText = `Principal: ${codCnae} - ${descCnae}`;
+        selectCnae.appendChild(optPrincipal);
+
+        // Adiciona Secundários se existirem
+        const secundários = data.cnaes_secundarios || [];
+        secundários.forEach(sec => {
+            const opt = document.createElement('option');
+            opt.value = sec.codigo;
+            opt.innerText = `Secundário: ${sec.codigo} - ${sec.descricao}`;
+            selectCnae.appendChild(opt);
+        });
+
+        // Adiciona opção manual de volta ao final
+        const optManual = document.createElement('option');
+        optManual.value = 'manual';
+        optManual.innerText = '-- Preenchimento Manual --';
+        selectCnae.appendChild(optManual);
+
+        // Dispara a aplicação direta do CNAE principal
+        aplicarConfiguracoesDoCNAE(codCnae);
     }
 
     function aplicarConfiguracoesDoCNAE(codigoCNAE) {
@@ -680,10 +712,21 @@
         parametrosCNAEAtual.presuncaoIRPJVend = regras.presuncaoIRPJVend;
         parametrosCNAEAtual.presuncaoCSLLVend = regras.presuncaoCSLLVend;
 
-        // 3. Atualiza Automaticamente o Redutor da CBS/IBS conforme o CNAE
-        document.getElementById('percentualReducao').value = regras.reducaoCBS;
+        // 3. Atualiza o input de Redução CBS e informa no label
+        const inputReducao = document.getElementById('percentualReducao');
+        inputReducao.value = regras.reducaoCBS;
 
-        // Recalcular toda a tabela e demonstrativos
+        const labelInfo = document.getElementById('labelReducaoInfo');
+        if (regras.reducaoCBS > 0) {
+            labelInfo.innerText = `(CNAE: -${regras.reducaoCBS}%)`;
+            labelInfo.style.color = '#10B981';
+            labelInfo.style.fontWeight = 'bold';
+        } else {
+            labelInfo.innerText = `(Via CNAE: 0%)`;
+            labelInfo.style.color = 'var(--ppse-medium-gray)';
+            labelInfo.style.fontWeight = 'normal';
+        }
+
         calcular();
     }
 
@@ -854,9 +897,7 @@
         else if (melhorRegime.val === totalSimplesHibrido) rowHibrido.className = 'row-winner';
         else rowLP.className = 'row-winner';
 
-        // ==========================================
         // MENSAGEM DINÂMICA DO WHATSAPP (5511996695188)
-        // ==========================================
         const cnpjVal = document.getElementById('cnpjInput').value || 'Não informado';
         const msgWhats = encodeURIComponent(
             `Olá, equipe PPSE Contábil!\n\n` +
@@ -876,8 +917,9 @@
         document.getElementById('memoDeducao').innerText = "Dedução: R$ " + ded.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('memoAliqEfetiva').innerText = (aliqEfetivaSimples * 100).toFixed(2) + "%";
 
+        const textoReducao = pReducaoCBS > 0 ? ` (Redução: ${(pReducaoCBS*100).toFixed(0)}%)` : '';
         document.getElementById('baseCBSDebito').innerText = "Líquida s/ ISS/ICMS: R$ " + baseDebitoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('valCBSDebito').innerText = "Débito: R$ " + valDebitoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('valCBSDebito').innerText = `Débito${textoReducao}: R$ ` + valDebitoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('baseCBSCredito').innerText = "Base Crédito: R$ " + baseCreditoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valCBSCredito').innerText = "Crédito: R$ " + valCreditoCBS.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('valCBSLiquido').innerText = "R$ " + cbsLiquido.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -914,7 +956,8 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-        calcular();
+        // Inicializa com o CNAE padrão selecionado (Contabilidade - 30% de redução)
+        aplicarConfiguracoesDoCNAE('6920601');
         animarContadorFlutuante();
     });
 </script>
