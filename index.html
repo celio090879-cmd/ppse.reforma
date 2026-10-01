@@ -82,6 +82,9 @@
                 margin-bottom: 5px !important;
                 border-top-width: 3px !important;
             }
+            .header-logo-img {
+                height: 34px !important;
+            }
             table th, table td {
                 padding: 3px 5px !important;
                 font-size: 8px !important;
@@ -96,13 +99,14 @@
     <!-- PÁGINA 1 NA IMPRESSÃO: CABEÇALHO + BLOCO 1 + BLOCO 2 -->
     <div class="print-page-1">
         
-        <!-- CABEÇALHO EXECUTIVO -->
+        <!-- CABEÇALHO EXECUTIVO COM LOGÓTIPO OFICIAL DA PPSE -->
         <header class="bg-white border-t-4 border-[#DA3E1B] rounded-xl p-4 shadow-sm border border-[#E2E8F0] mb-4 flex flex-col md:flex-row items-center justify-between gap-3">
-            <div class="flex items-center space-x-3.5">
-                <div class="w-11 h-11 rounded-lg bg-[#DA3E1B] flex items-center justify-center text-white text-xl font-black shadow-md flex-shrink-0">
-                    <i class="fa-solid fa-chart-pie"></i>
+            <div class="flex items-center space-x-4">
+                <!-- Logótipo Oficial PPSE inserido à esquerda -->
+                <div class="flex-shrink-0">
+                    <img src="PPSE_logo_color_OFICIAL.jpg" alt="PPSE Consultoria Contábil" class="header-logo-img h-12 w-auto object-contain">
                 </div>
-                <div>
+                <div class="border-l border-slate-200 pl-4">
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-black tracking-wider text-[#DA3E1B] uppercase">PPSE Consultoria Contábil</span>
                         <span class="bg-orange-100 text-[#DA3E1B] text-[10px] font-bold px-2 py-0.5 rounded-full border border-orange-200">Reforma Tributária IBS/CBS</span>
@@ -905,6 +909,7 @@
         calcular();
     }
 
+    // Máscara com 2 casas decimais estritas para percentuais
     function formatarPercentualInput(e) {
         let v = e.target.value.replace(/\D/g, '');
         if (v === '') {
@@ -1285,6 +1290,7 @@
             document.getElementById('economiaMensalVal').innerText = formatBRL(economiaMensal) + " / mês";
             document.getElementById('nomeRegimeVencedorBadge').innerText = melhorRegime.nome;
 
+            // Destaque visual nos cards
             ['cardBoxSimplesPuro', 'cardBoxSimplesHibrido', 'cardBoxLucroPresumido'].forEach(id => {
                 const el = document.getElementById(id);
                 el.classList.remove('card-winner-pulse', 'border-[#DA3E1B]');
